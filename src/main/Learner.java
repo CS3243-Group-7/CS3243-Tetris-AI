@@ -1,5 +1,7 @@
 package main;
 
+import java.util.Arrays;
+
 public class Learner {
     public static int GAMES_COUNT = 10;
     private double[][] featureWeights;
@@ -8,12 +10,13 @@ public class Learner {
         featureWeights = new double[GAMES_COUNT][Features.NUM_FEATURES];
         for (int i = 0; i < GAMES_COUNT; i++) {
             for (int j = 0; j < Features.NUM_FEATURES; j++) {
-                featureWeights[i][j] = 0;
+                int negativeMultiplier = (Math.random() > 0.5) ? -1 : 1;
+                featureWeights[i][j] = negativeMultiplier * Math.random() * 1000000;
             }
         }
     }
     
-    private double runGame(double[] featureWeights) {
+    private int runGame(double[] featureWeights) {
         State s = new State();
         TFrame frame = new TFrame(s);
         PlayerSkeleton p = new PlayerSkeleton(featureWeights);
@@ -31,8 +34,8 @@ public class Learner {
      * @param gameScores
      * @return
      */
-    public static int getRandomIndex(double[] gameScores) {
-        double scoreSum = 0;
+    public static int getRandomIndex(int[] gameScores) {
+        int scoreSum = 0;
         for (int i = 0; i < GAMES_COUNT; i++) {
             scoreSum += gameScores[i];
         }
@@ -41,7 +44,7 @@ public class Learner {
         
         double cumulativePercentage = 0;
         for (int i = 0; i < GAMES_COUNT; i++) {
-            cumulativePercentage = gameScores[i]/scoreSum;
+            cumulativePercentage = (double)gameScores[i]/scoreSum;
             if (cumulativePercentage >= randomVal) return i;
         }
         
@@ -64,20 +67,26 @@ public class Learner {
         for (int i = 0; i < Features.NUM_FEATURES; i++) {
             if (Math.random() < mutationProbability) {
                 Long longValue = Double.doubleToLongBits(featureWeights[i]);
-                System.out.println("longValue is: " + longValue);
-                String bitValue = Long.toString(longValue, 2);
+                String bitValue = Long.toBinaryString(longValue);
                 
+                // prepend leading zeroes
                 int bitValueLength = bitValue.length();
                 for (int j = 0; j < 64 - bitValueLength; j++) {
                     bitValue = '0' + bitValue;
                 }
-                System.out.println("bitValue is: " + bitValue);
-                int posToMutate = (int) Math.floor(Math.random() * 63) + 1;
+                int posToMutate = (int) Math.floor(Math.random() * 64);
                 char newBit = bitValue.charAt(posToMutate) == '1' ? '0' : '1';
                 if (posToMutate == 63) {
                     bitValue = bitValue.substring(0, posToMutate) + newBit;
                 } else {
                     bitValue = bitValue.substring(0, posToMutate) + newBit + bitValue.substring(posToMutate + 1);
+                }
+                
+                boolean isNegative = (bitValue.length() > 0 && bitValue.charAt(0) == '1') ? true : false;
+                if (isNegative) {
+                    bitValue = '-' + bitValue.substring(1);
+                } else {
+                    bitValue = bitValue.substring(1);
                 }
                 featureWeights[i] = Double.longBitsToDouble(Long.valueOf(bitValue, 2));
             }
@@ -86,16 +95,21 @@ public class Learner {
         return featureWeights;
     }
     
-    private void updateWeights(double[] gameScores) {
+    private void updateWeights(int[] gameScores) {
         // select new weights based on performance
-        double[][] selectFeatureWeights = new double[GAMES_COUNT][Features.NUM_FEATURES];
         
         for (int i = 0; i < GAMES_COUNT; i++) {
             int chosenIndex = getRandomIndex(gameScores);
             int chosenIndex2 = getRandomIndex(gameScores);
             double[] childFeatureWeights = reproduce(featureWeights[chosenIndex], featureWeights[chosenIndex2]);
             childFeatureWeights = mutate(childFeatureWeights);
-            selectFeatureWeights[i] = childFeatureWeights;
+            featureWeights[i] = childFeatureWeights;
+        }
+    }
+    
+    public void printAllFeatureWeights() {
+        for (int i = 0; i < featureWeights.length; i++) {
+            System.out.println("Feature weights " + i + ": " + Arrays.toString(featureWeights[i]));
         }
     }
     
@@ -105,20 +119,24 @@ public class Learner {
         int cycleNo = 1;
         while (true) {
             System.out.println("Starting cycle " + cycleNo);
-            double[] gameScores = new double[GAMES_COUNT];
+            System.out.print("Games: "); 
+            int[] gameScores = new int[GAMES_COUNT];
             for (int i = 0; i < GAMES_COUNT; i++) {
                 double[] gameFeatureWeights = {learner.featureWeights[i][0], learner.featureWeights[i][1], learner.featureWeights[i][2], learner.featureWeights[i][3]};
-                double gameScore = learner.runGame(gameFeatureWeights);
-                System.out.println("Game " + i + " ended with a score of " + gameScore);
+                int gameScore = learner.runGame(gameFeatureWeights);
+                System.out.print(gameScore);
+                if (i != GAMES_COUNT - 1) {
+                    System.out.print(", ");
+                } else {
+                    System.out.print("\n");
+                }
                 gameScores[i] = gameScore;
             }
             
             // evaluate and update weights
             learner.updateWeights(gameScores);
-            
-            
+            learner.printAllFeatureWeights();
             // end of learning
-            
             cycleNo++;
         }
     }

@@ -5,7 +5,7 @@ package main;
  */
 public class SearchState {
 
-    public static int[][] getCloneField(int[][] field) {
+    private static int[][] getCloneField(int[][] field) {
         int n = field.length;
         int[][] cloneField = new int[n][];
         for(int i = 0; i < n; i++) {
@@ -26,12 +26,19 @@ public class SearchState {
     //0 means empty
     private int[] top = new int[State.COLS];
 
+    //number of next piece
+    protected int nextPiece;
+
     public int[][] getField() {
         return field;
     }
 
     public int[] getTop() {
         return top;
+    }
+
+    public int getNextPiece() {
+        return nextPiece;
     }
 
     public boolean hasLost() {
@@ -46,12 +53,17 @@ public class SearchState {
         return turn;
     }
 
+    public void setNextPiece(int nextPiece) {
+        this.nextPiece = nextPiece;
+    }
+
     public SearchState(State s) {
         this.lost = s.hasLost();
         this.turn = s.getTurnNumber();
         this.cleared = s.getRowsCleared();
         this.field = getCloneField(s.getField());
         this.top = s.getTop().clone();
+        this.nextPiece = s.getNextPiece();
     }
 
     public SearchState(SearchState s) {
@@ -60,25 +72,26 @@ public class SearchState {
         this.cleared = s.getRowsCleared();
         this.field = getCloneField(s.getField());
         this.top = s.getTop().clone();
+        this.nextPiece = s.getNextPiece();
     }
 
     //gives legal moves for
-    public int[][] legalMoves(int nextPiece) {
+    public int[][] legalMoves() {
         return State.legalMoves[nextPiece];
     }
 
     //make a move based on the move index - its order in the legalMoves list
-    public void makeMove(int nextPiece, int move) {
-        makeMove(nextPiece, State.legalMoves[nextPiece][move]);
+    public void makeMove(int move) {
+        makeMove(State.legalMoves[nextPiece][move]);
     }
 
     //make a move based on an array of orient and slot
-    public void makeMove(int nextPiece, int[] move) {
-        makeMove(nextPiece, move[State.ORIENT],move[State.SLOT]);
+    public void makeMove(int[] move) {
+        makeMove(move[State.ORIENT],move[State.SLOT]);
     }
 
     //returns false if you lose - true otherwise
-    public boolean makeMove(int nextPiece, int orient, int slot) {
+    public boolean makeMove(int orient, int slot) {
         turn++;
         //height if the first column makes contact
         int height = top[slot]-State.getpBottom()[nextPiece][orient][0];

@@ -103,8 +103,8 @@ public class TFrame extends JFrame implements KeyListener{
 						s.drawNext(slot, orient);
 						
 						// Remove after testing
-						Features f = new Features(s.getField());
-						f.evaluate();
+						//Features f = new Features(s.getField());
+						//f.evaluate();
 						
 						break;
 					}

@@ -3,24 +3,25 @@ package main;
 public class PlayerSkeleton {
 	
 	final static double MIN_SCORE = -999999.0;
-
+	private double[] featureWeights;
+	
+	PlayerSkeleton(double[] featureWeights) {
+	    this.featureWeights = featureWeights;
+	}
+	
 	// implement this function to have a working system
 	public int pickMove(State s, int[][] legalMoves) {
-
 		double bestScore = MIN_SCORE;
 		int bestMove = 0;
 
 		for (int i = 0; i < legalMoves.length; i++) {
-			
 			double moveScore = checkMove(s, legalMoves[i][State.SLOT],
 					legalMoves[i][State.ORIENT]);
-			
 			if (moveScore > bestScore) {
 				bestMove = i;
 				bestScore = moveScore;
 			}
 		}
-
 		return bestMove;
 	}
 
@@ -65,27 +66,23 @@ public class PlayerSkeleton {
 		/******************/
 
 		/** OBTAIN EVALUATION **/
-		Features features = new Features(field);
+		Features features = new Features(field, featureWeights);
 		return features.evaluate();
 		/***********************/
 	}
 
 	public static void main(String[] args) {
-		State s = new State();
+		/*State s = new State();
 		new TFrame(s);
 		PlayerSkeleton p = new PlayerSkeleton();
 		while (!s.hasLost()) {
 			s.makeMove(p.pickMove(s, s.legalMoves()));
 			s.draw();
 			s.drawNext(0, 0);
-			try {
-				Thread.sleep(300);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			System.out.println("You have cleared " + s.getRowsCleared() + " rows.");
 		}
-		System.out.println("You have completed " + s.getRowsCleared()
-				+ " rows.");
+		System.out.println("You have completed " + s.getRowsCleared() + " rows.");
+		*/
 	}
 
 }
@@ -103,52 +100,43 @@ class Features {
 			"HOLES", "BUMPINESS" };
 
 	// TODO: Enter parameters here after deciding on them
-	final static double[] FEATURE_PARAMS = { -0.510066, 0.760666, -0.35663, -0.184483 };
+	double[] featureParams;
 
-	int[] featureValues;
+	int[] featureWeights;
 
-	public Features(int[][] field) {
-		featureValues = new int[NUM_FEATURES];
+	public Features(int[][] field, double[] featureWeights) {
+	    featureParams = featureWeights;
+		this.featureWeights = new int[NUM_FEATURES];
 		identifyFeatures(field);
 	}
 
 	public double evaluate() {
 		double score = 0.0;
 		for (int i = 0; i < NUM_FEATURES; i++) {
-
-			if (i < NUM_FEATURES - 1)
-				System.out.print(featureNames[i] + ": " + featureValues[i] + ", ");
+			/*if (i < NUM_FEATURES - 1)
+				System.out.print(featureNames[i] + ": " + featureWeights[i] + ", ");
 			else
-				System.out.println(featureNames[i] + ": " + featureValues[i]);
-
-			score += (featureValues[i] * FEATURE_PARAMS[i]);
+				System.out.println(featureNames[i] + ": " + featureWeights[i]);*/
+			score += (featureWeights[i] * featureParams[i]);
 		}
-		
-		System.out.println("Score: "  + score);
+		//System.out.println("Heuristic score: "  + score);
 		return score;
 	}
 
 	private void identifyFeatures(int[][] field) {
-
 		int[] maxHeight = getMaxHeight(field);
-
 		// TODO: Edit after deciding on features
-		featureValues[SUM_HEIGHT] = getFeatureValue(field, maxHeight,
-				SUM_HEIGHT);
-		featureValues[COMPLETED_LINES] = getFeatureValue(field, maxHeight,
-				COMPLETED_LINES);
-		featureValues[HOLES] = getFeatureValue(field, maxHeight, HOLES);
-		featureValues[BUMPINESS] = getFeatureValue(field, maxHeight, BUMPINESS);
+		featureWeights[SUM_HEIGHT] = getFeatureValue(field, maxHeight, SUM_HEIGHT);
+		featureWeights[COMPLETED_LINES] = getFeatureValue(field, maxHeight, COMPLETED_LINES);
+		featureWeights[HOLES] = getFeatureValue(field, maxHeight, HOLES);
+		featureWeights[BUMPINESS] = getFeatureValue(field, maxHeight, BUMPINESS);
 	}
 
 	private int getFeatureValue(int[][] field, int[] maxHeight, int featureID) {
-
 		// TODO: Edit after deciding on features
 		switch (featureID) {
 		case SUM_HEIGHT:
-
 			int sumHeight = 0;
-
 			for (int j = 0; j < State.COLS; j++) {
 				for (int i = State.ROWS - 1; i >= 0; i--) {
 					if (field[i][j] > 0) {
@@ -157,16 +145,13 @@ class Features {
 					}
 				}
 			}
-
 			return sumHeight;
 
 		case COMPLETED_LINES:
-
 			int completedLines = 0;
 			int minHeight = State.ROWS + 1;
 			for (int i = 0; i < maxHeight.length; i++)
 				minHeight = Math.min(minHeight, maxHeight[i]);
-
 			for (int i = 0; i < minHeight; i++) {
 				boolean lineComplete = true;
 				for (int j = 0; j < State.COLS; j++) {
@@ -175,33 +160,25 @@ class Features {
 						break;
 					}
 				}
-
 				if (lineComplete)
 					completedLines++;
 			}
-
 			return completedLines;
 
 		case HOLES:
-
 			int holes = 0;
-
 			for (int j = 0; j < State.COLS; j++) {
 				for (int i = 0; i < maxHeight[j] - 1; i++) {
 					if (field[i][j] == 0)
 						holes++;
 				}
 			}
-
 			return holes;
 
 		case BUMPINESS:
-
 			int bumps = 0;
-
 			for (int j = 0; j < State.COLS - 1; j++)
 				bumps += Math.abs(maxHeight[j] - maxHeight[j + 1]);
-
 			return bumps;
 
 		default:
@@ -210,9 +187,7 @@ class Features {
 	}
 
 	private int[] getMaxHeight(int[][] field) {
-
 		int[] maxHeight = new int[State.COLS];
-
 		for (int j = 0; j < State.COLS; j++) {
 			for (int i = State.ROWS - 1; i >= 0; i--) {
 				if (field[i][j] > 0) {
@@ -223,7 +198,6 @@ class Features {
 					maxHeight[j] = 0;
 			}
 		}
-
 		return maxHeight;
 	}
 }

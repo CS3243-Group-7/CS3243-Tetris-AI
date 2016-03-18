@@ -1,20 +1,32 @@
 package main;
 
 public class PlayerSkeleton {
-	
+
 	final static double MIN_SCORE = -999999.0;
+	// TODO: Enter parameters here after deciding on them
+//	 final static double[] FINAL_FEATURE_PARAMS = { -0.510066, 0.760666,
+//	 -0.35663, -0.184483 };
+
+	 final static double[] FINAL_FEATURE_PARAMS = { -0.073606428, 0.808448531,
+	 -0.336284346, -0.091663862 };
 
 	// implement this function to have a working system
 	public int pickMove(State s, int[][] legalMoves) {
+
+		return pickMove(s, legalMoves, FINAL_FEATURE_PARAMS);
+	}
+
+	// Used by learning algorithm
+	public int pickMove(State s, int[][] legalMoves, double[] params) {
 
 		double bestScore = MIN_SCORE;
 		int bestMove = 0;
 
 		for (int i = 0; i < legalMoves.length; i++) {
-			
+
 			double moveScore = checkMove(s, legalMoves[i][State.SLOT],
-					legalMoves[i][State.ORIENT]);
-			
+					legalMoves[i][State.ORIENT], params);
+
 			if (moveScore > bestScore) {
 				bestMove = i;
 				bestScore = moveScore;
@@ -24,8 +36,8 @@ public class PlayerSkeleton {
 		return bestMove;
 	}
 
-	private double checkMove(State s, int slot, int orient) {
-		
+	private double checkMove(State s, int slot, int orient, double[] params) {
+
 		int nextPiece = s.nextPiece;
 		int[][][] pBottom = State.getpBottom();
 		int[][][] pTop = State.getpTop();
@@ -65,7 +77,7 @@ public class PlayerSkeleton {
 		/******************/
 
 		/** OBTAIN EVALUATION **/
-		Features features = new Features(field);
+		Features features = new Features(field, params);
 		return features.evaluate();
 		/***********************/
 	}
@@ -79,7 +91,7 @@ public class PlayerSkeleton {
 			s.draw();
 			s.drawNext(0, 0);
 			try {
-				Thread.sleep(300);
+				Thread.sleep(0);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -102,13 +114,12 @@ class Features {
 	final static String[] featureNames = { "SUM_HEIGHT", "COMPLETED_LINES",
 			"HOLES", "BUMPINESS" };
 
-	// TODO: Enter parameters here after deciding on them
-	final static double[] FEATURE_PARAMS = { -0.510066, 0.760666, -0.35663, -0.184483 };
+	private double[] featureParams;
+	private int[] featureValues;
 
-	int[] featureValues;
-
-	public Features(int[][] field) {
+	public Features(int[][] field, double[] featuresParams) {
 		featureValues = new int[NUM_FEATURES];
+		featureParams = featuresParams;
 		identifyFeatures(field);
 	}
 
@@ -116,15 +127,16 @@ class Features {
 		double score = 0.0;
 		for (int i = 0; i < NUM_FEATURES; i++) {
 
-			if (i < NUM_FEATURES - 1)
-				System.out.print(featureNames[i] + ": " + featureValues[i] + ", ");
-			else
-				System.out.println(featureNames[i] + ": " + featureValues[i]);
+			// if (i < NUM_FEATURES - 1)
+			// System.out.print(featureNames[i] + ": " + featureValues[i] +
+			// ", ");
+			// else
+			// System.out.println(featureNames[i] + ": " + featureValues[i]);
 
-			score += (featureValues[i] * FEATURE_PARAMS[i]);
+			score += (featureValues[i] * featureParams[i]);
 		}
-		
-		System.out.println("Score: "  + score);
+
+		// System.out.println("Score: " + score);
 		return score;
 	}
 

@@ -48,7 +48,7 @@ public class Learner {
             if (cumulativePercentage >= randomVal) return i;
         }
         
-        return GAMES_COUNT - 1;
+        return (int) Math.floor(Math.random() * GAMES_COUNT);
     }
     
     // crossover
@@ -117,8 +117,11 @@ public class Learner {
         Learner learner = new Learner();
         learner.initialiseFeatureWeights();
         int cycleNo = 1;
+        int bestScore = 0;
+        double[] bestFeatureWeights = new double[Features.NUM_FEATURES];
         while (true) {
             System.out.println("Starting cycle " + cycleNo);
+            //learner.printAllFeatureWeights();
             System.out.print("Games: "); 
             int[] gameScores = new int[GAMES_COUNT];
             for (int i = 0; i < GAMES_COUNT; i++) {
@@ -131,11 +134,14 @@ public class Learner {
                     System.out.print("\n");
                 }
                 gameScores[i] = gameScore;
+                if (gameScore > bestScore) {
+                    bestScore = gameScore;
+                    bestFeatureWeights = learner.featureWeights[i];
+                }
             }
-            
+            System.out.println("Current best score and weights: " + bestScore + " and " + Arrays.toString(bestFeatureWeights));
             // evaluate and update weights
             learner.updateWeights(gameScores);
-            learner.printAllFeatureWeights();
             // end of learning
             cycleNo++;
         }

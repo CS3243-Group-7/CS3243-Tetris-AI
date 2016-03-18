@@ -3,14 +3,29 @@ package main;
 
 public class PlayerSkeleton {
 
+	public static final int SEARCH_DEPTH = 5;
+
+	public double evaluate(State s) {
+		return 0.0;
+	}
+
+
+	public double maxMove(int depthLeft, State s) {
+
+	}
+
+	public double expectedMove(int depthLeft, State s) {
+
+	}
+
 	//implement this function to have a working system
 	public int pickMove(State s, int[][] legalMoves) {
 		
 		int orient = (int)Math.floor(Math.random() * legalMoves.length);
 		int slot = (int)Math.floor(Math.random() * legalMoves[orient].length);
 
-        System.out.println("Orient: " + orient);
-        System.out.println("Slot: " + slot);
+        System.out.println("Orient: " + orient + "/" + legalMoves.length);
+        System.out.println("Slot: " + slot + "/" + legalMoves[orient].length);
 		int move = legalMoves[orient][slot];
 		System.out.println("Move: " + move);
 		return move;

@@ -18,14 +18,14 @@ public class Learner {
     
     private int runGame(double[] featureWeights) {
         State s = new State();
-        TFrame frame = new TFrame(s);
+        //TFrame frame = new TFrame(s);
         PlayerSkeleton p = new PlayerSkeleton(featureWeights);
         while (!s.hasLost()) {
             s.makeMove(p.pickMove(s, s.legalMoves()));
-            s.draw();
-            s.drawNext(0, 0);
+            //s.draw();
+            //s.drawNext(0, 0);
         }
-        frame.dispose();
+        //frame.dispose();
         return s.getRowsCleared();
     }
     
@@ -63,7 +63,7 @@ public class Learner {
     }
     
     private double[] mutate(double[] featureWeights) {
-        double mutationProbability = 1.0/Features.NUM_FEATURES;
+        double mutationProbability = 1.0/100;//Features.NUM_FEATURES;
         for (int i = 0; i < Features.NUM_FEATURES; i++) {
             if (Math.random() < mutationProbability) {
                 Long longValue = Double.doubleToLongBits(featureWeights[i]);

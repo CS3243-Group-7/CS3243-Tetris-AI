@@ -3,37 +3,35 @@ package main;
 
 public class PlayerSkeleton {
 
-	public static final int SEARCH_DEPTH = 1;
+	public static final int SEARCH_DEPTH = 2;
 	public static final double NEGATIVE_INFINITY = -2000000;
 
-	public double evaluate(SearchState s, int depthLeft) {
-		if (s.hasLost()) {
-			return NEGATIVE_INFINITY + (SEARCH_DEPTH - depthLeft) * 7;
-		}
-		return new Features(s.getField()).evaluate() + s.getRowsCleared() * 20 + (SEARCH_DEPTH - depthLeft) * 7;
+	public double evaluate(SearchState s, int moves) {
+		double bonusScore = s.getRowsCleared() * 1.160666 / moves + moves * 0.860666;
+		return bonusScore + ((s.hasLost()) ? NEGATIVE_INFINITY : new Features(s.getField()).evaluate());
 	}
 
-	public double maxMove(int depthLeft, SearchState s) {
+	public double maxMove(int moves, SearchState s) {
 		int[][] legalMoves = s.legalMoves();
 		double maxValue = NEGATIVE_INFINITY;
 		for(int orient = 0; orient < legalMoves.length; orient++) {
 			for(int slot = 0; slot < legalMoves[orient].length; slot++) {
 				SearchState cloneState = s.clone();
 				cloneState.makeMove(legalMoves[orient][slot]);
-				maxValue = Math.max(maxValue, expectedMove(depthLeft, cloneState));
+				maxValue = Math.max(maxValue, expectedMove(moves, cloneState));
 			}
 		}
 		return maxValue;
 	}
 
-	public double expectedMove(int depthLeft, SearchState s) {
-		if (depthLeft == 0 || s.hasLost()) {
-			return evaluate(s, depthLeft);
+	public double expectedMove(int moves, SearchState s) {
+		if (moves == SEARCH_DEPTH || s.hasLost()) {
+			return evaluate(s, moves);
 		}
 		double expectedValue = 0.0;
 		for(int nextPiece = 0; nextPiece < State.N_PIECES; nextPiece++) {
 			s.setNextPiece(nextPiece);
-			double value = maxMove(depthLeft - 1, s);
+			double value = maxMove(moves + 1, s);
 			expectedValue += value;
 		}
 		expectedValue /= State.N_PIECES;
@@ -51,7 +49,7 @@ public class PlayerSkeleton {
 				SearchState searchState = new SearchState(s);
 				searchState.makeMove(nextMove);
 
-				double nextValue = expectedMove(SEARCH_DEPTH, searchState);
+				double nextValue = expectedMove(1, searchState);
 				if (nextValue <= maxValue) {
 					continue;
 				}

@@ -15,13 +15,14 @@ public class Learner {
     
     private double runGame(double[] featureWeights) {
         State s = new State();
-        new TFrame(s);
+        TFrame frame = new TFrame(s);
         PlayerSkeleton p = new PlayerSkeleton(featureWeights);
         while (!s.hasLost()) {
             s.makeMove(p.pickMove(s, s.legalMoves()));
             s.draw();
             s.drawNext(0, 0);
         }
+        frame.dispose();
         return s.getRowsCleared();
     }
     

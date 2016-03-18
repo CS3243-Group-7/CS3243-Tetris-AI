@@ -5,16 +5,16 @@ public class PlayerSkeleton {
 
 	public static final int SEARCH_DEPTH = 5;
 
-	public double evaluate(State s) {
+	public double evaluate(SearchState s) {
 		return 0.0;
 	}
 
 
-	public double maxMove(int depthLeft, State s) {
+	public double maxMove(int depthLeft, SearchState s) {
 
 	}
 
-	public double expectedMove(int depthLeft, State s) {
+	public double expectedMove(int depthLeft, SearchState s) {
 
 	}
 

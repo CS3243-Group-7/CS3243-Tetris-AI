@@ -71,21 +71,30 @@ public class PlayerSkeleton {
 	}
 
 	public static void main(String[] args) {
-		State s = new State();
-		new TFrame(s);
-		PlayerSkeleton p = new PlayerSkeleton();
-		while (!s.hasLost()) {
-			s.makeMove(p.pickMove(s, s.legalMoves()));
-			s.draw();
-			s.drawNext(0, 0);
-			try {
-				Thread.sleep(300);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+		int[] scores = new int[10];
+		for (int i = 0; i < 10; i++) {
+			State s = new State();
+			TFrame frame = new TFrame(s);
+			PlayerSkeleton p = new PlayerSkeleton();
+			while (!s.hasLost()) {
+				s.makeMove(p.pickMove(s, s.legalMoves()));
+				s.draw();
+				s.drawNext(0, 0);
 			}
+			frame.dispose();
+			scores[i] = s.getRowsCleared();
+			System.out.println("You have completed " + s.getRowsCleared() + " rows.");
 		}
-		System.out.println("You have completed " + s.getRowsCleared()
-				+ " rows.");
+		
+		double averageScore = 0;
+		System.out.println("Games: ");
+		for(int i = 0; i < 10; i++) {
+			if (i != 0) System.out.print(", ");
+			System.out.print(scores[i]);
+			averageScore += scores[i]/10.0;
+		}
+		System.out.print("\n");
+		System.out.println("Average score is: " + averageScore);
 	}
 
 }
@@ -103,7 +112,7 @@ class Features {
 			"HOLES", "BUMPINESS" };
 
 	// TODO: Enter parameters here after deciding on them
-	final static double[] FEATURE_PARAMS = { -0.510066, 0.760666, -0.35663, -0.184483 };
+	final static double[] FEATURE_PARAMS = { 263633.7273721519 , 168657.15914404683, -492215.3487530613, -39614.60678172904 };
 
 	int[] featureValues;
 

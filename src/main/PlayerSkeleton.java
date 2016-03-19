@@ -6,20 +6,20 @@ public class PlayerSkeleton {
 	public static final int SEARCH_DEPTH = 2;
 	public static final double NEGATIVE_INFINITY = -2000000;
 
+	public int height;
+
 	public double evaluate(SearchState s, int moves) {
-		double bonusScore = s.getRowsCleared() * 1.160666 / moves + moves * 0.860666;
+		double bonusScore = (s.getRowsCleared() - height) * 0.760666 + moves * 0;
 		return bonusScore + ((s.hasLost()) ? NEGATIVE_INFINITY : new Features(s.getField()).evaluate());
 	}
 
 	public double maxMove(int moves, SearchState s) {
 		int[][] legalMoves = s.legalMoves();
 		double maxValue = NEGATIVE_INFINITY;
-		for(int orient = 0; orient < legalMoves.length; orient++) {
-			for(int slot = 0; slot < legalMoves[orient].length; slot++) {
-				SearchState cloneState = s.clone();
-				cloneState.makeMove(legalMoves[orient][slot]);
-				maxValue = Math.max(maxValue, expectedMove(moves, cloneState));
-			}
+		for(int move = 0; move < legalMoves.length; move++) {
+			SearchState cloneState = s.clone();
+			cloneState.makeMove(move);
+			maxValue = Math.max(maxValue, expectedMove(moves, cloneState));
 		}
 		return maxValue;
 	}
@@ -40,25 +40,23 @@ public class PlayerSkeleton {
 
 	//implement this function to have a working system
 	public int pickMove(State s) {
+		height = s.getRowsCleared();
 		int[][] legalMoves = s.legalMoves();
 		double maxValue = Double.NEGATIVE_INFINITY;
 		int maxMove = 0;
-		for(int orient = 0; orient < legalMoves.length; orient++) {
-			for(int slot = 0; slot < legalMoves[orient].length; slot++) {
-				int nextMove = legalMoves[orient][slot];
-				SearchState searchState = new SearchState(s);
-				searchState.makeMove(nextMove);
+		for(int move = 0; move < legalMoves.length; move++) {
+			SearchState searchState = new SearchState(s);
+			searchState.makeMove(move);
 
-				double nextValue = expectedMove(1, searchState);
-				if (nextValue <= maxValue) {
-					continue;
-				}
-				maxValue = nextValue;
-				maxMove = nextMove;
+			double nextValue = expectedMove(1, searchState);
+			if (nextValue <= maxValue) {
+				continue;
 			}
+			maxValue = nextValue;
+			maxMove = move;
 		}
 
-		System.out.println("Move: " + maxMove + " Value: " + maxValue + " Rows: " + s.getRowsCleared());
+		//System.out.println("Move: " + maxMove + " Value: " + maxValue + " Rows: " + s.getRowsCleared());
 		return maxMove;
 	}
 	
@@ -70,11 +68,12 @@ public class PlayerSkeleton {
 			s.makeMove(p.pickMove(s));
 			s.draw();
 			s.drawNext(0,0);
+			/*
 			try {
 				Thread.sleep(300);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-			}
+			}*/
 		}
 		System.out.println("You have completed "+s.getRowsCleared()+" rows.");
 	}

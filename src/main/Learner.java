@@ -1,9 +1,16 @@
 package main;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.logging.FileHandler;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class Learner {
-    public static int GAMES_COUNT = 10;
+
+    public static Logger logger = Logger.getGlobal();
+    public static int GAMES_COUNT = 1000;
     private double[][] featureWeights;
     
     private void initialiseFeatureWeights() {
@@ -113,37 +120,65 @@ public class Learner {
         }
     }
     
+    public static void initializeLogFile() throws IOException {
+        FileHandler logHandler = new FileHandler("tetris.log");
+        LogManager.getLogManager().reset(); // removes printout to console
+                                            // aka root handler
+        logHandler.setFormatter(new SimpleFormatter()); // set output to a
+                                                        // human-readable
+                                                        // log format
+        logger.addHandler(logHandler);
+    }
+    
     public static void main(String[] args) {
-        Learner learner = new Learner();
-        learner.initialiseFeatureWeights();
-        int cycleNo = 1;
-        int bestScore = 0;
-        double[] bestFeatureWeights = new double[Features.NUM_FEATURES];
-        while (true) {
-            System.out.println("Starting cycle " + cycleNo);
-            //learner.printAllFeatureWeights();
-            System.out.print("Games: "); 
-            int[] gameScores = new int[GAMES_COUNT];
-            for (int i = 0; i < GAMES_COUNT; i++) {
-                double[] gameFeatureWeights = {learner.featureWeights[i][0], learner.featureWeights[i][1], learner.featureWeights[i][2], learner.featureWeights[i][3]};
-                int gameScore = learner.runGame(gameFeatureWeights);
-                System.out.print(gameScore);
-                if (i != GAMES_COUNT - 1) {
-                    System.out.print(", ");
-                } else {
-                    System.out.print("\n");
+        try {
+            initializeLogFile();
+            Learner learner = new Learner();
+            learner.initialiseFeatureWeights();
+            int cycleNo = 1;
+            int bestScore = 0;
+            int cycleOfBestScore = 0;
+            double[] bestFeatureWeights = new double[Features.NUM_FEATURES];
+            while (true) {
+                int bestScoreOfCycle = 0;
+                logger.info("Starting cycle " + cycleNo);
+                //learner.printAllFeatureWeights();
+                String gameResults = "Games: "; 
+                int[] gameScores = new int[GAMES_COUNT];
+                for (int i = 0; i < GAMES_COUNT; i++) {
+                    double[] gameFeatureWeights = {learner.featureWeights[i][0], learner.featureWeights[i][1], learner.featureWeights[i][2], learner.featureWeights[i][3]};
+                    int gameScore = learner.runGame(gameFeatureWeights);
+                    gameResults += gameScore;
+                    if (i != GAMES_COUNT - 1) {
+                        gameResults += ", ";
+                    } else {
+                        gameResults += "\n";
+                    }
+                    gameScores[i] = gameScore;
+                    if (gameScore > bestScore) {
+                        cycleOfBestScore = cycleNo;
+                        bestScore = gameScore;
+                        bestFeatureWeights = learner.featureWeights[i];
+                    }
+                    if (gameScore > bestScoreOfCycle) {
+                        bestScoreOfCycle = gameScore;
+                    }
                 }
-                gameScores[i] = gameScore;
-                if (gameScore > bestScore) {
-                    bestScore = gameScore;
-                    bestFeatureWeights = learner.featureWeights[i];
-                }
+                logger.info(gameResults);
+                logger.info("Best score for CURRENT cycle: " + bestScoreOfCycle);
+                logger.info("Current best score and weights: " + bestScore + " and " + Arrays.toString(bestFeatureWeights) + " from cycle " + cycleOfBestScore);
+                // evaluate and update weights
+                learner.updateWeights(gameScores);
+                // end of learning
+                cycleNo++;
             }
-            System.out.println("Current best score and weights: " + bestScore + " and " + Arrays.toString(bestFeatureWeights));
-            // evaluate and update weights
-            learner.updateWeights(gameScores);
-            // end of learning
-            cycleNo++;
+        } catch (SecurityException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
+        
     }
 }

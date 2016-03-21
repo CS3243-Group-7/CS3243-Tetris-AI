@@ -41,7 +41,7 @@ public class Learner {
      * @param gameScores
      * @return
      */
-    public static int getRandomIndex(int[] gameScores) {
+    public static int getRandomIndex(double[] gameScores) {
         int scoreSum = 0;
         for (int i = 0; i < GAMES_COUNT; i++) {
             scoreSum += gameScores[i];
@@ -102,7 +102,7 @@ public class Learner {
         return featureWeights;
     }
     
-    private void updateWeights(int[] gameScores) {
+    private void updateWeights(double[] gameScores) {
         // select new weights based on performance
         
         for (int i = 0; i < GAMES_COUNT; i++) {
@@ -136,32 +136,39 @@ public class Learner {
             Learner learner = new Learner();
             learner.initialiseFeatureWeights();
             int cycleNo = 1;
-            int bestScore = 0;
+            double bestScore = 0;
             int cycleOfBestScore = 0;
             double[] bestFeatureWeights = new double[Features.NUM_FEATURES];
             while (true) {
-                int bestScoreOfCycle = 0;
+                double bestScoreOfCycle = 0;
                 logger.info("Starting cycle " + cycleNo);
                 //learner.printAllFeatureWeights();
                 String gameResults = "Games: "; 
-                int[] gameScores = new int[GAMES_COUNT];
+                double[] gameScores = new double[GAMES_COUNT];
                 for (int i = 0; i < GAMES_COUNT; i++) {
                     double[] gameFeatureWeights = {learner.featureWeights[i][0], learner.featureWeights[i][1], learner.featureWeights[i][2], learner.featureWeights[i][3]};
-                    int gameScore = learner.runGame(gameFeatureWeights);
-                    gameResults += gameScore;
+                    
+                    int totalScoreOfGames = 0;
+                    for (int j = 0; j < 100; j++) {
+                        int gameScore = learner.runGame(gameFeatureWeights);
+                        totalScoreOfGames += gameScore;
+                    }
+                    double averageScoreOfGames = totalScoreOfGames/100.0;
+                    
+                    gameResults += averageScoreOfGames;
                     if (i != GAMES_COUNT - 1) {
                         gameResults += ", ";
                     } else {
                         gameResults += "\n";
                     }
-                    gameScores[i] = gameScore;
-                    if (gameScore > bestScore) {
+                    gameScores[i] = averageScoreOfGames;
+                    if (averageScoreOfGames > bestScore) {
                         cycleOfBestScore = cycleNo;
-                        bestScore = gameScore;
+                        bestScore = averageScoreOfGames;
                         bestFeatureWeights = learner.featureWeights[i];
                     }
-                    if (gameScore > bestScoreOfCycle) {
-                        bestScoreOfCycle = gameScore;
+                    if (averageScoreOfGames > bestScoreOfCycle) {
+                        bestScoreOfCycle = averageScoreOfGames;
                     }
                 }
                 logger.info(gameResults);

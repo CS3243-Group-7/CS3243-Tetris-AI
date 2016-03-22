@@ -10,14 +10,15 @@ import java.util.TreeSet;
 
 public class TetrisGeneticLearner {
 
+	private static final String RESULT_FILE_NAME = "Result";
 	private final static double[] PARAMS_RANGE = { -1.0, 1.0 };
+	private final static int NUM_PARAMS = 4;
 
 	// Settings
-	private final static int NUM_PARAMS = 4;
-	private final static int SAMPLE_SIZE = 20;
-	private final static int GAMES_PER_GENE = 1;
+	private static int SAMPLE_SIZE = 10;
+	private static int GAMES_PER_GENE = 1;
+	private static int NUM_GENES_TO_PAIR = 4;
 	private final static int PIECES_PER_GAME = 500;
-	private final static double NUM_GENES_TO_PAIR = 6;
 	private final static double CHANCE_TO_MUTATE = 0.05;
 	private final static double[] MUTATION_RANGE = { -0.2, 0.2 };
 	private final static double ERROR_TOLERANCE = 0.1;
@@ -71,7 +72,7 @@ public class TetrisGeneticLearner {
 				for (int i = 0; i < genePool.size() - SAMPLE_SIZE; i++)
 					geneSortedByFitness.pollLast();
 			}
-			
+
 			Gene bestGene = geneSortedByFitness.first();
 			Gene worstGene = geneSortedByFitness.last();
 			System.out.println("Best fitness: " + bestGene.fitness
@@ -79,24 +80,26 @@ public class TetrisGeneticLearner {
 
 			// Save result of this iteration
 			try {
-				File file = new File("Genetic_learning_result.csv");
+				File file = new File(RESULT_FILE_NAME + "_samp-" + SAMPLE_SIZE
+						+ "_games-" + GAMES_PER_GENE + "_numPair-"
+						+ NUM_GENES_TO_PAIR + ".csv");
 
 				if (!file.exists())
 					file.createNewFile();
-				
+
 				BufferedWriter fileWriter = new BufferedWriter(new FileWriter(
 						file, true));
 				fileWriter.write(iteration + "," + bestGene.fitness + ","
 						+ worstGene.fitness + ",");
-				
-				for(int i = 0; i < NUM_PARAMS; i++) {
+
+				for (int i = 0; i < NUM_PARAMS; i++) {
 					fileWriter.write(String.valueOf(bestGene.params[i]));
-					if(i < NUM_PARAMS - 1)
+					if (i < NUM_PARAMS - 1)
 						fileWriter.write(",");
 					else
 						fileWriter.write("\n");
 				}
-				
+
 				fileWriter.close();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -134,17 +137,11 @@ public class TetrisGeneticLearner {
 					}
 				}
 				newGenes.add(new Gene(newParams));
-				newGenes.add(gene1);
-				newGenes.add(gene2);
 			}
 
 			// Generate new gene poll
-			genePool = new ArrayList<Gene>();
 			while (!newGenes.isEmpty()) {
 				genePool.add(newGenes.poll());
-			}
-			while (!geneSortedByFitness.isEmpty()) {
-				genePool.add(geneSortedByFitness.pollLast());
 			}
 		}
 	}
@@ -157,7 +154,7 @@ public class TetrisGeneticLearner {
 
 		int piecesPlayed = 0;
 
-		while (!s.hasLost()) {
+		while (!s.hasLost() && piecesPlayed < PIECES_PER_GAME) {
 
 			s.makeMove(p.pickMove(s, s.legalMoves(), params));
 
@@ -174,6 +171,13 @@ public class TetrisGeneticLearner {
 	}
 
 	public static void main(String[] args) {
+
+		if (args.length != 0) {
+			SAMPLE_SIZE = Integer.valueOf(args[0]);
+			GAMES_PER_GENE = Integer.valueOf(args[1]);
+			NUM_GENES_TO_PAIR = Integer.valueOf(args[2]);
+		}
+
 		TetrisGeneticLearner learner = new TetrisGeneticLearner();
 		learner.run();
 

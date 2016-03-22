@@ -7,8 +7,8 @@ public class PlayerSkeleton {
 //	 final static double[] FINAL_FEATURE_PARAMS = { -0.510066, 0.760666,
 //	 -0.35663, -0.184483 };
 
-	 final static double[] FINAL_FEATURE_PARAMS = { -0.073606428, 0.808448531,
-	 -0.336284346, -0.091663862 };
+	final static double[] FINAL_FEATURE_PARAMS = { 0.388056847, 0.546060804,
+			-0.808234719, -0.100375789 };
 
 	// implement this function to have a working system
 	public int pickMove(State s, int[][] legalMoves) {
@@ -91,7 +91,7 @@ public class PlayerSkeleton {
 			s.draw();
 			s.drawNext(0, 0);
 			try {
-				Thread.sleep(0);
+				Thread.sleep(300);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

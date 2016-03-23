@@ -41,20 +41,25 @@ public class Learner {
      * @param gameScores
      * @return
      */
-    public static int getRandomIndex(double[] gameScores) {
+    public static int getRandomIndex(double[] gameScores, double cutOffScore) {
         int scoreSum = 0;
-        for (int i = 0; i < GAMES_COUNT; i++) {
-            scoreSum += gameScores[i];
+        for (int i = 0; i < gameScores.length; i++) {
+            if (cutOffScore <= gameScores[i]) {
+                scoreSum += gameScores[i];
+            }
         }
         
         double randomVal = Math.random();
         
         double cumulativePercentage = 0;
-        for (int i = 0; i < GAMES_COUNT; i++) {
-            cumulativePercentage = (double)gameScores[i]/scoreSum;
-            if (cumulativePercentage >= randomVal) return i;
+        for (int i = 0; i < gameScores.length; i++) {
+            if (cutOffScore <= gameScores[i]) {
+                cumulativePercentage += (double) gameScores[i] / scoreSum;
+                if (cumulativePercentage >= randomVal) return i;
+            }
         }
         
+        System.out.println("Error occured: randoming a game");
         return (int) Math.floor(Math.random() * GAMES_COUNT);
     }
     
@@ -101,13 +106,20 @@ public class Learner {
         
         return featureWeights;
     }
+    private double getCutOffScore(double[] gameScores) {
+        double[] clonedGameScores = gameScores.clone();
+        Arrays.sort(clonedGameScores);
+        return clonedGameScores[(int)(GAMES_COUNT * 0.9)];
+    }
     
     private void updateWeights(double[] gameScores) {
         // select new weights based on performance
-        
+
+        double cutOffScore = getCutOffScore(gameScores);
+        System.out.println("cutOffScore: " + cutOffScore);
         for (int i = 0; i < GAMES_COUNT; i++) {
-            int chosenIndex = getRandomIndex(gameScores);
-            int chosenIndex2 = getRandomIndex(gameScores);
+            int chosenIndex = getRandomIndex(gameScores, cutOffScore);
+            int chosenIndex2 = getRandomIndex(gameScores, cutOffScore);
             double[] childFeatureWeights = reproduce(featureWeights[chosenIndex], featureWeights[chosenIndex2]);
             childFeatureWeights = mutate(childFeatureWeights);
             featureWeights[i] = childFeatureWeights;

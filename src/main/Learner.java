@@ -9,14 +9,15 @@ import java.util.logging.SimpleFormatter;
 
 public class Learner {
 
+    public static int NUM_WEIGHTS = Features.NUM_FEATURES * 7;
     public static Logger logger = Logger.getGlobal();
     public static int GAMES_COUNT = 1000;
     private double[][] featureWeights;
     
     private void initialiseFeatureWeights() {
-        featureWeights = new double[GAMES_COUNT][Features.NUM_FEATURES];
+        featureWeights = new double[GAMES_COUNT][NUM_WEIGHTS];
         for (int i = 0; i < GAMES_COUNT; i++) {
-            for (int j = 0; j < Features.NUM_FEATURES; j++) {
+            for (int j = 0; j < NUM_WEIGHTS; j++) {
                 int negativeMultiplier = (Math.random() > 0.5) ? -1 : 1;
                 featureWeights[i][j] = negativeMultiplier * Math.random() * 1000000;
             }
@@ -25,14 +26,10 @@ public class Learner {
     
     private int runGame(double[] featureWeights) {
         State s = new State();
-        //TFrame frame = new TFrame(s);
         PlayerSkeleton p = new PlayerSkeleton(featureWeights);
         while (!s.hasLost()) {
             s.makeMove(p.pickMove(s, s.legalMoves()));
-            //s.draw();
-            //s.drawNext(0, 0);
         }
-        //frame.dispose();
         return s.getRowsCleared();
     }
     
@@ -65,9 +62,9 @@ public class Learner {
     
     // crossover
     private double[] reproduce(double[] featureWeightsOne, double[] featureWeightsTwo) {
-        int crossOverPoint = (int) Math.floor(Math.random() * Features.NUM_FEATURES);
-        double[] childFeatureWeights = new double[Features.NUM_FEATURES];
-        for (int i = 0; i < Features.NUM_FEATURES; i++) {
+        int crossOverPoint = (int) Math.floor(Math.random() * NUM_WEIGHTS);
+        double[] childFeatureWeights = new double[NUM_WEIGHTS];
+        for (int i = 0; i < NUM_WEIGHTS; i++) {
             childFeatureWeights[i] = (i > crossOverPoint) ? featureWeightsTwo[i] : featureWeightsOne[i];
         }
         
@@ -75,8 +72,8 @@ public class Learner {
     }
     
     private double[] mutate(double[] featureWeights) {
-        double mutationProbability = 1.0/100;//Features.NUM_FEATURES;
-        for (int i = 0; i < Features.NUM_FEATURES; i++) {
+        double mutationProbability = 1.0/NUM_WEIGHTS;//100;//Features.NUM_FEATURES;
+        for (int i = 0; i < NUM_WEIGHTS; i++) {
             if (Math.random() < mutationProbability) {
                 Long longValue = Double.doubleToLongBits(featureWeights[i]);
                 String bitValue = Long.toBinaryString(longValue);
@@ -145,25 +142,49 @@ public class Learner {
     public static void main(String[] args) {
         try {
             initializeLogFile();
-            Learner learner = new Learner();
+            final Learner learner = new Learner();
             learner.initialiseFeatureWeights();
             int cycleNo = 1;
             double bestScore = 0;
             int cycleOfBestScore = 0;
-            double[] bestFeatureWeights = new double[Features.NUM_FEATURES];
+            double[] bestFeatureWeights = new double[NUM_WEIGHTS];
             while (true) {
+                long time = System.nanoTime()/1000000;
                 double bestScoreOfCycle = 0;
                 logger.info("Starting cycle " + cycleNo);
                 //learner.printAllFeatureWeights();
                 String gameResults = "Games: "; 
-                double[] gameScores = new double[GAMES_COUNT];
+                double[] averageGameScores = new double[GAMES_COUNT];
+                final double[] gameFeatureWeights = new double[NUM_WEIGHTS];
                 for (int i = 0; i < GAMES_COUNT; i++) {
-                    double[] gameFeatureWeights = {learner.featureWeights[i][0], learner.featureWeights[i][1], learner.featureWeights[i][2], learner.featureWeights[i][3]};
+                    for (int j = 0; j < NUM_WEIGHTS; j++) {
+                        gameFeatureWeights[j] = learner.featureWeights[i][j];
+                    }
                     
-                    int totalScoreOfGames = 0;
+                    double totalScoreOfGames = 0;
+                    final int[] gameScores = new int[GAMES_COUNT];
+                    Thread[] threads = new Thread[100];
                     for (int j = 0; j < 100; j++) {
-                        int gameScore = learner.runGame(gameFeatureWeights);
-                        totalScoreOfGames += gameScore;
+                        final int index = j;
+                        
+                        threads[j] = new Thread() {
+                            @Override
+                            public void run() {
+                                gameScores[index] = learner.runGame(gameFeatureWeights);
+                            }
+                        };
+                        threads[j].start();
+                    }
+                    for (int j = 0; j < 100; j++) {
+                        try {
+                            threads[j].join();
+                        } catch (InterruptedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                    for (int j = 0; j < 100; j++) {
+                        totalScoreOfGames += gameScores[j];
                     }
                     double averageScoreOfGames = totalScoreOfGames/100.0;
                     
@@ -173,7 +194,7 @@ public class Learner {
                     } else {
                         gameResults += "\n";
                     }
-                    gameScores[i] = averageScoreOfGames;
+                    averageGameScores[i] = averageScoreOfGames;
                     if (averageScoreOfGames > bestScore) {
                         cycleOfBestScore = cycleNo;
                         bestScore = averageScoreOfGames;
@@ -182,14 +203,18 @@ public class Learner {
                     if (averageScoreOfGames > bestScoreOfCycle) {
                         bestScoreOfCycle = averageScoreOfGames;
                     }
+                    
                 }
                 logger.info(gameResults);
                 logger.info("Best score for CURRENT cycle: " + bestScoreOfCycle);
                 logger.info("Current best score and weights: " + bestScore + " and " + Arrays.toString(bestFeatureWeights) + " from cycle " + cycleOfBestScore);
                 // evaluate and update weights
-                learner.updateWeights(gameScores);
+                learner.updateWeights(averageGameScores);
                 // end of learning
                 cycleNo++;
+
+                long time2 = System.nanoTime()/1000000;
+                System.out.println("Total time for cycle " + cycleNo +": " + (time2-time) + "ms.");
             }
         } catch (SecurityException e) {
             // TODO Auto-generated catch block

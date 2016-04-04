@@ -66,7 +66,7 @@ public class PlayerSkeleton {
 		/******************/
 
 		/** OBTAIN EVALUATION **/
-		Features features = new Features(field, featureWeights);
+		Features features = new Features(field, featureWeights, nextPiece);
 		return features.evaluate();
 		/***********************/
 	}
@@ -102,34 +102,30 @@ class Features {
 	// TODO: Enter parameters here after deciding on them
 	double[] featureParams;
 
-	int[] featureWeights;
+	int[] featureValues;
+	int piece;
 
-	public Features(int[][] field, double[] featureWeights) {
+	public Features(int[][] field, double[] featureWeights, int piece) {
 	    featureParams = featureWeights;
-		this.featureWeights = new int[NUM_FEATURES];
-		identifyFeatures(field);
+		this.featureValues = new int[Learner.NUM_WEIGHTS];
+		identifyFeatures(field, piece);
 	}
 
 	public double evaluate() {
 		double score = 0.0;
-		for (int i = 0; i < NUM_FEATURES; i++) {
-			/*if (i < NUM_FEATURES - 1)
-				System.out.print(featureNames[i] + ": " + featureWeights[i] + ", ");
-			else
-				System.out.println(featureNames[i] + ": " + featureWeights[i]);*/
-			score += (featureWeights[i] * featureParams[i]);
+		for (int i = 0; i < Learner.NUM_WEIGHTS; i++) {
+			score += (featureValues[i] * featureParams[i]);
 		}
-		//System.out.println("Heuristic score: "  + score);
 		return score;
 	}
 
-	private void identifyFeatures(int[][] field) {
+	private void identifyFeatures(int[][] field, int piece) {
 		int[] maxHeight = getMaxHeight(field);
 		// TODO: Edit after deciding on features
-		featureWeights[SUM_HEIGHT] = getFeatureValue(field, maxHeight, SUM_HEIGHT);
-		featureWeights[COMPLETED_LINES] = getFeatureValue(field, maxHeight, COMPLETED_LINES);
-		featureWeights[HOLES] = getFeatureValue(field, maxHeight, HOLES);
-		featureWeights[BUMPINESS] = getFeatureValue(field, maxHeight, BUMPINESS);
+		featureValues[SUM_HEIGHT] = getFeatureValue(field, maxHeight, SUM_HEIGHT);
+		featureValues[COMPLETED_LINES] = getFeatureValue(field, maxHeight, COMPLETED_LINES);
+		featureValues[HOLES] = getFeatureValue(field, maxHeight, HOLES);
+		featureValues[BUMPINESS] = getFeatureValue(field, maxHeight, BUMPINESS);
 	}
 
 	private int getFeatureValue(int[][] field, int[] maxHeight, int featureID) {
@@ -138,12 +134,7 @@ class Features {
 		case SUM_HEIGHT:
 			int sumHeight = 0;
 			for (int j = 0; j < State.COLS; j++) {
-				for (int i = State.ROWS - 1; i >= 0; i--) {
-					if (field[i][j] > 0) {
-						sumHeight += maxHeight[j];
-						break;
-					}
-				}
+				sumHeight += maxHeight[j];
 			}
 			return sumHeight;
 

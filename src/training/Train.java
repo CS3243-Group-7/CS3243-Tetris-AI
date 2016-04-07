@@ -10,7 +10,11 @@ public class Train {
 
     private void initFeatures() {
         features = new Feature[] {
-                Feature.getSumHeight(-0.510066),
+                //Feature.getSumHeight(-0.510066),
+                Feature.getRowTransitions(-0.424),
+                Feature.getColumnTransitions(-2.026),
+                Feature.getHighestHole(-0.663),
+                Feature.getSumWellDepths(0),
                 Feature.getCompletedLines(0.760666),
                 Feature.getHoleCount(-0.35663),
                 Feature.getBumpiness(-0.184483)

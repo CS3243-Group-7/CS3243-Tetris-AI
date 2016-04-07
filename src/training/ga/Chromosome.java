@@ -4,7 +4,6 @@ import main.Player;
 import training.Feature;
 import utility.Pair;
 
-import java.util.Arrays;
 import java.util.Random;
 
 public class Chromosome {

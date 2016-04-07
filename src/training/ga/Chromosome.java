@@ -1,31 +1,35 @@
 package training.ga;
 
 import main.Player;
-import main.State;
-import training.Feature1;
+import training.Feature;
 import utility.Pair;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class Chromosome {
-    private Feature1 feature;
+    private Feature[] features;
     private Random random = new Random();
     private int fitness;
 
-    public Chromosome(Feature1 feature) {
-        this.feature = feature;
+    public Chromosome(Feature[] features) {
+        this.features = features;
     }
 
     public Chromosome(Chromosome other) {
-        this.feature = new Feature1(other.getFeature());
+        Feature[] otherFeatures = other.getFeatures();
+        features = new Feature[otherFeatures.length];
+        for (int i = 0; i < features.length; i++) {
+            features[i] = new Feature(otherFeatures[i]);
+        }
     }
 
-    public Feature1 getFeature() {
-        return feature;
+    public Feature[] getFeatures() {
+        return features;
     }
 
     public static boolean areCompatible(Chromosome a, Chromosome b) {
-        return a.feature.getClass().equals(b.getFeature().getClass());
+        return a.features.getClass().equals(b.getFeatures().getClass());
     }
 
     public static Pair<Chromosome, Chromosome> crossOver(Chromosome a, Chromosome b) {
@@ -33,20 +37,22 @@ public class Chromosome {
             a = new Chromosome(a);
             b = new Chromosome(b);
             Random random = new Random();
-            int[] permutation = new int[a.feature.getFeaturesCount()];
-            for (int i = 0; i < a.feature.getFeaturesCount(); i++) {
+            int[] permutation = new int[a.features.length];
+            for (int i = 0; i < a.features.length; i++) {
                 permutation[i] = i;
+                /*
                 int j = random.nextInt(i + 1);
                 int t = permutation[i];
                 permutation[i] = permutation[j];
                 permutation[j] = t;
+                */
             }
-            for (int i = 0; i < a.feature.getFeaturesCount(); i++) {
-                double aValue = a.feature.getFeatureValue(permutation[i]);
-                double bValue = b.feature.getFeatureValue(i);
+            for (int i = 0; i < a.features.length; i++) {
+                double aValue = a.features[i].getValue();
+                double bValue = b.features[i].getValue();
                 if (random.nextBoolean()) {
-                    b.feature.change(i, aValue);
-                    a.feature.change(permutation[i], bValue);
+                    b.features[i].setValue(aValue);
+                    a.features[permutation[i]].setValue(bValue);
                 }
             }
             return new Pair<>(a, b);
@@ -56,14 +62,21 @@ public class Chromosome {
     }
 
     public void mutate() {
-        int id = random.nextInt(feature.getFeaturesCount());
-        double oldValue = feature.getFeatureValue(id);
+        int id = random.nextInt(features.length);
+        double oldValue = features[id].getValue();
+        long longBit = Double.doubleToLongBits(oldValue);
+        int pos = random.nextInt(40);
+        longBit ^= 1L << pos;
+        features[id].setValue(Double.longBitsToDouble(longBit));
+        /*
+        double oldValue = features[id].getValue();
         double newValue = random.nextGaussian() + oldValue;
-        feature.change(id, newValue);
+        features[id].setValue(newValue);
+        */
     }
 
     public void calcFitness() {
-        fitness = new Player().play(feature);
+        fitness = new Player().play(features);
     }
 
     public int getFitness() {
@@ -72,8 +85,8 @@ public class Chromosome {
 
     @Override
     public String toString() {
-        return String.format("Lines scored: %d\nWeights: {%f, %f, %f, %f, %f}\n", getFitness(),
-                feature.getFeatureValue(0), feature.getFeatureValue(1), feature.getFeatureValue(2),
-                feature.getFeatureValue(3), feature.getFeatureValue(4));
+        return String.format("Lines scored: %d\nWeights: {%f, %f, %f, %f}\n", getFitness(),
+                features[0].getValue(), features[1].getValue(), features[2].getValue(),
+                features[3].getValue());
     }
 }

@@ -1,11 +1,13 @@
 package main;
 
-import training.Feature1;
+import training.Feature;
+
+import java.util.Arrays;
 
 public class Player {
 
     final static double MIN_SCORE = -999999.0;
-    Feature1 currentFeature;
+    private Feature[] currentFeatures;
 
     // implement this function to have a working system
     public int pickMove(State s, int[][] legalMoves) {
@@ -68,18 +70,35 @@ public class Player {
         /******************/
 
         /** OBTAIN EVALUATION **/
-        return currentFeature.getScore(field, s.getRowsCleared());
+        return getFeaturesScore(field);
         /***********************/
     }
 
+    private double getFeaturesScore(int[][] field) {
+        double sum = 0;
+        for (int i = 0; i < currentFeatures.length; i++) {
+            sum += currentFeatures[i].getScore(field);
+        }
+        return sum;
+    }
 
-    public int play(Feature1 feature) {
-        currentFeature = feature;
+    public int play(Feature[] features) {
+        currentFeatures = features;
         State s = new State();
+        //new TFrame(s);
         int step = 0;
         while (!s.hasLost()) {
             ++step;
             s.makeMove(pickMove(s, s.legalMoves()));
+            /*
+            s.draw();
+            s.drawNext(0, 0);
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            */
         }
         return s.getRowsCleared();
     }

@@ -9,7 +9,7 @@ import java.util.logging.SimpleFormatter;
 
 public class Learner {
 
-    public static int NUM_WEIGHTS = Features.NUM_FEATURES * 7;
+    public static int NUM_WEIGHTS = Features.NUM_FEATURES;
     public static Logger logger = Logger.getGlobal();
     public static int GAMES_COUNT = 1000;
     private double[][] featureWeights;

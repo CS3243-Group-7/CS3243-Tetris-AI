@@ -91,13 +91,12 @@ class Features {
 
 	// From
 	// https://codemyroad.wordpress.com/2013/04/14/tetris-ai-the-near-perfect-player/
-	final static int NUM_FEATURES = 4;
+	final static int NUM_FEATURES = 5;
 	final static int SUM_HEIGHT = 0;
 	final static int COMPLETED_LINES = 1;
 	final static int HOLES = 2;
 	final static int BUMPINESS = 3;
-	final static String[] featureNames = { "SUM_HEIGHT", "COMPLETED_LINES",
-			"HOLES", "BUMPINESS" };
+	final static int BLOCKADES = 4;
 
 	// TODO: Enter parameters here after deciding on them
 	double[] featureParams;
@@ -126,6 +125,7 @@ class Features {
 		featureValues[COMPLETED_LINES] = getFeatureValue(field, maxHeight, COMPLETED_LINES);
 		featureValues[HOLES] = getFeatureValue(field, maxHeight, HOLES);
 		featureValues[BUMPINESS] = getFeatureValue(field, maxHeight, BUMPINESS);
+        featureValues[BLOCKADES] = getFeatureValue(field, maxHeight, BLOCKADES);
 	}
 
 	private int getFeatureValue(int[][] field, int[] maxHeight, int featureID) {
@@ -171,7 +171,20 @@ class Features {
 			for (int j = 0; j < State.COLS - 1; j++)
 				bumps += Math.abs(maxHeight[j] - maxHeight[j + 1]);
 			return bumps;
-
+		case BLOCKADES:
+            int blockades = 0;
+            for (int j = 0; j < State.COLS; j++) {
+                boolean holeFound = false;
+                for (int i = 0; i < maxHeight[j] - 1; i++) {
+                    if (field[i][j] == 0) {
+                        holeFound = true;
+                    }
+                    if (holeFound && field[i][j] == 1) {
+                        blockades++;
+                    }
+                }
+            }
+            return blockades;
 		default:
 			return -1;
 		}

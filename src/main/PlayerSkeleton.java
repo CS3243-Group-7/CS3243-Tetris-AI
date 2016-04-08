@@ -75,7 +75,7 @@ public class PlayerSkeleton {
 		double[] featureWeights = {289827.9893530809, 294090.72601293115, -683705.0586926689, -96950.25669499802, -4.867328372457503E-6};
 		PlayerSkeleton p = new PlayerSkeleton(featureWeights);
 		double scoreSum = 0;
-		int noOfGames = 10;
+		int noOfGames = 100;
 		
 		for (int i = 0; i < noOfGames; i++) {
 	        State s = new State();
@@ -134,6 +134,9 @@ class Features {
 		featureValues[HOLES] = getFeatureValue(field, maxHeight, HOLES);
 		featureValues[BUMPINESS] = getFeatureValue(field, maxHeight, BUMPINESS);
         featureValues[BLOCKADES] = getFeatureValue(field, maxHeight, BLOCKADES);
+        /*System.out.println("Sum Height: " + featureValues[SUM_HEIGHT] + "COMPLETED_LINES: " + featureValues[COMPLETED_LINES] + 
+                "HOLES: " + featureValues[HOLES] + "BUMPINESS: " + featureValues[BUMPINESS] + 
+                "BLOCKADES: " + featureValues[BLOCKADES]);*/
 	}
 
 	private int getFeatureValue(int[][] field, int[] maxHeight, int featureID) {
@@ -183,11 +186,11 @@ class Features {
             int blockades = 0;
             for (int j = 0; j < State.COLS; j++) {
                 boolean holeFound = false;
-                for (int i = 0; i < maxHeight[j] - 1; i++) {
+                for (int i = 0; i < maxHeight[j]; i++) {
                     if (field[i][j] == 0) {
                         holeFound = true;
                     }
-                    if (holeFound && field[i][j] == 1) {
+                    if (holeFound && field[i][j] != 0) {
                         blockades++;
                     }
                 }

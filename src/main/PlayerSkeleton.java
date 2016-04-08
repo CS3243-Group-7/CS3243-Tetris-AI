@@ -9,10 +9,11 @@ public class PlayerSkeleton {
 	public int height;
 
 	public double evaluate(SearchState s, int moves) {
-		double bonusScore = (s.getRowsCleared() - height) * 0.760666 + moves * 0;
-		return bonusScore + ((s.hasLost()) ? NEGATIVE_INFINITY : new Features(s.getField()).evaluate());
+		//double bonusScore = (s.getRowsCleared() - height) * 0.760666 + moves * 0;
+		return ((s.hasLost()) ? NEGATIVE_INFINITY : new Features(s.getField()).evaluate());
 	}
 
+	// Gets the highest state score of all possible moves
 	public double maxMove(int moves, SearchState s) {
 		int[][] legalMoves = s.legalMoves();
 		double maxValue = NEGATIVE_INFINITY;
@@ -24,14 +25,15 @@ public class PlayerSkeleton {
 		return maxValue;
 	}
 
+	// Gets the average score of the different resulting states after performing the best move for each possible piece 
 	public double expectedMove(int moves, SearchState s) {
-		if (moves == SEARCH_DEPTH || s.hasLost()) {
+		if (moves == 1 || s.hasLost()) {
 			return evaluate(s, moves);
 		}
 		double expectedValue = 0.0;
 		for(int nextPiece = 0; nextPiece < State.N_PIECES; nextPiece++) {
 			s.setNextPiece(nextPiece);
-			double value = maxMove(moves + 1, s);
+			double value = maxMove(moves - 1, s);
 			expectedValue += value;
 		}
 		expectedValue /= State.N_PIECES;
@@ -48,7 +50,7 @@ public class PlayerSkeleton {
 			SearchState searchState = new SearchState(s);
 			searchState.makeMove(move);
 
-			double nextValue = expectedMove(1, searchState);
+			double nextValue = expectedMove(SEARCH_DEPTH, searchState);
 			if (nextValue <= maxValue) {
 				continue;
 			}
@@ -62,12 +64,12 @@ public class PlayerSkeleton {
 	
 	public static void main(String[] args) {
 		State s = new State();
-		new TFrame(s);
+		//new TFrame(s);
 		PlayerSkeleton p = new PlayerSkeleton();
 		while(!s.hasLost()) {
 			s.makeMove(p.pickMove(s));
-			s.draw();
-			s.drawNext(0,0);
+			//s.draw();
+			//s.drawNext(0,0);
 			/*
 			try {
 				Thread.sleep(300);

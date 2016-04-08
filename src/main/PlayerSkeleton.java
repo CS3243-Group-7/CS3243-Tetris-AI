@@ -72,17 +72,25 @@ public class PlayerSkeleton {
 	}
 
 	public static void main(String[] args) {
-		/*State s = new State();
-		new TFrame(s);
-		PlayerSkeleton p = new PlayerSkeleton();
-		while (!s.hasLost()) {
-			s.makeMove(p.pickMove(s, s.legalMoves()));
-			s.draw();
-			s.drawNext(0, 0);
-			System.out.println("You have cleared " + s.getRowsCleared() + " rows.");
+		double[] featureWeights = {289827.9893530809, 294090.72601293115, -683705.0586926689, -96950.25669499802, -4.867328372457503E-6};
+		PlayerSkeleton p = new PlayerSkeleton(featureWeights);
+		double scoreSum = 0;
+		int noOfGames = 10;
+		
+		for (int i = 0; i < noOfGames; i++) {
+	        State s = new State();
+	        TFrame frame = new TFrame(s);
+		    while (!s.hasLost()) {
+		        s.makeMove(p.pickMove(s, s.legalMoves()));
+		        s.draw();
+		        s.drawNext(0, 0);
+		        //System.out.println("You have cleared " + s.getRowsCleared() + " rows.");
+		    }
+		    frame.dispose();
+	        System.out.println("You have completed " + s.getRowsCleared() + " rows.");
+	        scoreSum += s.getRowsCleared();
 		}
-		System.out.println("You have completed " + s.getRowsCleared() + " rows.");
-		*/
+		System.out.println("Average performance: " + scoreSum/noOfGames);
 	}
 
 }

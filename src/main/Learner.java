@@ -211,10 +211,10 @@ public class Learner {
                 // evaluate and update weights
                 learner.updateWeights(averageGameScores);
                 // end of learning
-                cycleNo++;
 
                 long time2 = System.nanoTime()/1000000;
                 System.out.println("Total time for cycle " + cycleNo +": " + (time2-time) + "ms.");
+                cycleNo++;
             }
         } catch (SecurityException e) {
             // TODO Auto-generated catch block

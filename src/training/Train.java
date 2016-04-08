@@ -14,7 +14,7 @@ public class Train {
                 Feature.getRowTransitions(-0.424),
                 Feature.getColumnTransitions(-2.026),
                 Feature.getHighestHole(-0.663),
-                Feature.getSumWellDepths(0),
+                Feature.getSumWellDepths(-0.425),
                 Feature.getCompletedLines(0.760666),
                 Feature.getHoleCount(-0.35663),
                 Feature.getBumpiness(-0.184483)
@@ -23,7 +23,7 @@ public class Train {
 
     public void train() {
         initFeatures();
-        Population population = new Population(20, features);
+        Population population = new Population(5, features);
         Chromosome bestGuy = population.evolve();
         System.out.println("bestGuy: " + bestGuy);
     }

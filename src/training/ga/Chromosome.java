@@ -4,9 +4,13 @@ import main.Player;
 import training.Feature;
 import utility.Pair;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class Chromosome {
+
+    private static final int TRIES = 4;
+
     private Feature[] features;
     private Random random = new Random();
     private int fitness;
@@ -63,19 +67,16 @@ public class Chromosome {
     public void mutate() {
         int id = random.nextInt(features.length);
         double oldValue = features[id].getValue();
-        long longBit = Double.doubleToLongBits(oldValue);
-        int pos = random.nextInt(40);
-        longBit ^= 1L << pos;
-        features[id].setValue(Double.longBitsToDouble(longBit));
-        /*
-        double oldValue = features[id].getValue();
-        double newValue = random.nextGaussian() + oldValue;
+        double newValue = random.nextGaussian() * 10 + oldValue;
         features[id].setValue(newValue);
-        */
     }
 
     public void calcFitness() {
-        fitness = new Player().play(features);
+        int tot = 0;
+        for (int i = 0; i < TRIES; i++) {
+            tot += new Player().play(features);
+        }
+        fitness = tot / TRIES;
     }
 
     public int getFitness() {
@@ -84,8 +85,12 @@ public class Chromosome {
 
     @Override
     public String toString() {
-        return String.format("Lines scored: %d\nWeights: {%f, %f, %f, %f}\n", getFitness(),
-                features[0].getValue(), features[1].getValue(), features[2].getValue(),
-                features[3].getValue());
+        StringBuilder str = new StringBuilder("Lines scored: ");
+        str.append(getFitness());
+        str.append("\n");
+        str.append("{ ");
+        Arrays.stream(features).forEach(feature -> str.append(feature.getEval() + " "));
+        str.append("}");
+        return str.toString();
     }
 }

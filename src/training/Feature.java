@@ -14,6 +14,11 @@ public class Feature {
         this.eval = eval;
     }
 
+    @Override
+    public String toString() {
+        return "VALUE = " + value;
+    }
+
     public Feature(Feature other) {
         this.value = other.getValue();
         this.eval = other.getEval();

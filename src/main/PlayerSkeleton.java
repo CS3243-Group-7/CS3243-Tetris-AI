@@ -3,10 +3,9 @@ package main;
 
 public class PlayerSkeleton {
 
-	public static final int SEARCH_DEPTH = 2;
+	public static final int SEARCH_DEPTH = 1;
 	public static final double NEGATIVE_INFINITY = -2000000;
 
-	public int height;
 
 	public double evaluate(SearchState s) {
 		return ((s.hasLost()) ? NEGATIVE_INFINITY : new Features(s.getField()).evaluate());
@@ -41,7 +40,6 @@ public class PlayerSkeleton {
 
 	//implement this function to have a working system
 	public int pickMove(State s) {
-		height = s.getRowsCleared();
 		int[][] legalMoves = s.legalMoves();
 		double maxValue = Double.NEGATIVE_INFINITY;
 		int maxMove = 0;
@@ -51,10 +49,9 @@ public class PlayerSkeleton {
 
 			double nextValue = expectedMove(SEARCH_DEPTH, searchState);
 			if (nextValue <= maxValue) {
-				continue;
+	            maxValue = nextValue;
+	            maxMove = move;
 			}
-			maxValue = nextValue;
-			maxMove = move;
 		}
 
 		return maxMove;
@@ -92,7 +89,7 @@ class Features {
 	final static int BLOCKADES = 4;
 
 	// TODO: Enter parameters here after deciding on them
-	final static double[] FEATURE_PARAMS = {313300.2773120599, 229964.7308794143, -717791.124980646, -84492.84048195634, -5.460081633537773};
+	final static double[] FEATURE_PARAMS = {289827.9893530809, 294090.72601293115, -683705.0586926689, -96950.25669499802, -4.867328372457503E-6};
 
 	int[] featureValues;
 
@@ -123,9 +120,9 @@ class Features {
 		featureValues[BUMPINESS] = getFeatureValue(field, maxHeight, BUMPINESS);
 
         featureValues[BLOCKADES] = getFeatureValue(field, maxHeight, BLOCKADES);
-        System.out.println("Sum Height: " + featureValues[SUM_HEIGHT] + "COMPLETED_LINES: " + featureValues[COMPLETED_LINES] + 
+       /* System.out.println("Sum Height: " + featureValues[SUM_HEIGHT] + "COMPLETED_LINES: " + featureValues[COMPLETED_LINES] + 
                 "HOLES: " + featureValues[HOLES] + "BUMPINESS: " + featureValues[BUMPINESS] + 
-                "BLOCKADES: " + featureValues[BLOCKADES]);
+                "BLOCKADES: " + featureValues[BLOCKADES]);*/
 	}
 
 	private int getFeatureValue(int[][] field, int[] maxHeight, int featureID) {
@@ -134,18 +131,11 @@ class Features {
 		switch (featureID) {
 			case SUM_HEIGHT:
 
-				int sumHeight = 0;
-
-				for (int j = 0; j < State.COLS; j++) {
-					for (int i = State.ROWS - 1; i >= 0; i--) {
-						if (field[i][j] > 0) {
-							sumHeight += maxHeight[j];
-							break;
-						}
-					}
-				}
-
-				return sumHeight;
+			    int sumHeight = 0;
+	            for (int j = 0; j < State.COLS; j++) {
+	                sumHeight += maxHeight[j];
+	            }
+	            return sumHeight;
 
 			case COMPLETED_LINES:
 
@@ -215,7 +205,7 @@ class Features {
 
 		for (int j = 0; j < State.COLS; j++) {
 			for (int i = State.ROWS - 1; i >= 0; i--) {
-				if (field[i][j] > 0) {
+				if (field[i][j] != 0) {
 					maxHeight[j] = (i + 1);
 					break;
 				}

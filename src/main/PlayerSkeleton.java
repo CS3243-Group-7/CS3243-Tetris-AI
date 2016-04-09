@@ -3,7 +3,7 @@ package main;
 
 public class PlayerSkeleton {
 
-	public static final int SEARCH_DEPTH = 2;
+	public static final int SEARCH_DEPTH = 1;
 	public static final double NEGATIVE_INFINITY = -2000000;
 
 	private double[] featureWeights;
@@ -67,6 +67,7 @@ public class PlayerSkeleton {
 	}
 	
 	public static void main(String[] args) {
+	    // ensure weights have same number of weights as features
 	    final double[] finalisedFeatureWeights = {262277.7288257435, 368932.27367163956, -961034.7867291301, -157346.07062358136, -1.464370383197647};
 		State s = new State();
 		new TFrame(s);
@@ -86,12 +87,14 @@ class Features {
 
 	// From
 	// https://codemyroad.wordpress.com/2013/04/14/tetris-ai-the-near-perfect-player/
-	final static int NUM_FEATURES = 5;
+	final static int NUM_FEATURES = 7;
 	final static int SUM_HEIGHT = 0;
 	final static int COMPLETED_LINES = 1;
 	final static int HOLES = 2;
 	final static int BUMPINESS = 3;
 	final static int BLOCKADES = 4;
+	final static int HIGHEST = 5;
+	final static int HEIGHTDIFF_MAXMIN = 6;
 
 	// TODO: Enter parameters here after deciding on them
 	//final static double[] FEATURE_PARAMS = {262277.7288257435, 368932.27367163956, -961034.7867291301, -157346.07062358136, -1.464370383197647};
@@ -117,18 +120,9 @@ class Features {
 	private void identifyFeatures(int[][] field) {
 		int[] maxHeight = getMaxHeight(field);
 
-		// TODO: Edit after deciding on features
-		featureValues[SUM_HEIGHT] = getFeatureValue(field, maxHeight,
-				SUM_HEIGHT);
-		featureValues[COMPLETED_LINES] = getFeatureValue(field, maxHeight,
-				COMPLETED_LINES);
-		featureValues[HOLES] = getFeatureValue(field, maxHeight, HOLES);
-		featureValues[BUMPINESS] = getFeatureValue(field, maxHeight, BUMPINESS);
-
-        featureValues[BLOCKADES] = getFeatureValue(field, maxHeight, BLOCKADES);
-       /* System.out.println("Sum Height: " + featureValues[SUM_HEIGHT] + "COMPLETED_LINES: " + featureValues[COMPLETED_LINES] + 
-                "HOLES: " + featureValues[HOLES] + "BUMPINESS: " + featureValues[BUMPINESS] + 
-                "BLOCKADES: " + featureValues[BLOCKADES]);*/
+		for (int i = 0; i < NUM_FEATURES; i++) {
+		    featureValues[i] = getFeatureValue(field, maxHeight, i);
+		}
 	}
 
 	private int getFeatureValue(int[][] field, int[] maxHeight, int featureID) {
@@ -200,6 +194,26 @@ class Features {
 	                }
 	            }
 	            return blockades;
+			case HIGHEST:
+                int highest = 0;
+                for (int j = 0; j < State.COLS; j++) {
+                    if (maxHeight[j] > highest) {
+                        highest = maxHeight[j];
+                    }
+                }
+                return highest;
+			case HEIGHTDIFF_MAXMIN:
+                int highestCol = 0;
+                int lowestCol = State.ROWS;
+                for (int j = 0; j < State.COLS; j++) {
+                    if (maxHeight[j] > highestCol) {
+                        highest = maxHeight[j];
+                    }
+                    if (maxHeight[j] < lowestCol) {
+                        lowestCol = maxHeight[j];
+                    }
+                }
+                return highestCol - lowestCol;
 			default:
 				return -1;
 		}

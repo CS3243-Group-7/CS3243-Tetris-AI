@@ -19,6 +19,9 @@ public class SearchState {
     //current turn
     private int turn = 0;
     private int cleared = 0;
+    
+    private int height;
+    private int orient;
 
     //each square in the grid - int means empty - other values mean the turn it was placed
     private int[][] field = new int[State.ROWS][State.COLS];
@@ -94,7 +97,8 @@ public class SearchState {
     public boolean makeMove(int orient, int slot) {
         turn++;
         //height if the first column makes contact
-        int height = top[slot]-State.getpBottom()[nextPiece][orient][0];
+        this.orient = orient;
+        this.height = top[slot]-State.getpBottom()[nextPiece][orient][0];
         //for each column beyond the first in the piece
         for(int c = 1; c < State.pWidth[nextPiece][orient];c++) {
             height = Math.max(height,top[slot+c]-State.getpBottom()[nextPiece][orient][c]);
@@ -120,9 +124,10 @@ public class SearchState {
         for(int c = 0; c < State.getpWidth()[nextPiece][orient]; c++) {
             top[slot+c]=height+State.getpTop()[nextPiece][orient][c];
         }
+        return true;
+    }
 
-        int rowsCleared = 0;
-
+    public void resolveMove() {
         //check for full rows - starting at the top
         for(int r = height+State.getpHeight()[nextPiece][orient]-1; r >= height; r--) {
             //check all columns in the row
@@ -135,7 +140,6 @@ public class SearchState {
             }
             //if the row was full - remove it and slide above stuff down
             if(full) {
-                rowsCleared++;
                 cleared++;
                 //for each column
                 for(int c = 0; c < State.COLS; c++) {
@@ -150,7 +154,6 @@ public class SearchState {
                 }
             }
         }
-        return true;
     }
 
     public SearchState clone() {

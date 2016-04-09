@@ -18,7 +18,7 @@ public class PlayerSkeleton {
 		for(int move = 0; move < legalMoves.length; move++) {
 			SearchState cloneState = s.clone();
 			cloneState.makeMove(move);
-			maxValue = Math.max(maxValue, expectedMove(moves, cloneState));
+			maxValue = Math.max(maxValue, expectedMove(moves - 1, cloneState));
 		}
 		return maxValue;
 	}
@@ -28,10 +28,11 @@ public class PlayerSkeleton {
 		if (moves == 1 || s.hasLost()) {
 			return evaluate(s);
 		}
+		s.resolveMove();
 		double expectedValue = 0.0;
 		for(int nextPiece = 0; nextPiece < State.N_PIECES; nextPiece++) {
 			s.setNextPiece(nextPiece);
-			double value = maxMove(moves - 1, s);
+			double value = maxMove(moves, s);
 			expectedValue += value;
 		}
 		expectedValue /= State.N_PIECES;
@@ -48,7 +49,7 @@ public class PlayerSkeleton {
 			searchState.makeMove(move);
 
 			double nextValue = expectedMove(SEARCH_DEPTH, searchState);
-			if (nextValue <= maxValue) {
+			if (nextValue > maxValue) {
 	            maxValue = nextValue;
 	            maxMove = move;
 			}
@@ -65,12 +66,7 @@ public class PlayerSkeleton {
 			s.makeMove(p.pickMove(s));
 			s.draw();
 			s.drawNext(0,0);
-			/*
-			try {
-				Thread.sleep(300);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}*/
+			
 		}
 		System.out.println("You have completed "+s.getRowsCleared()+" rows.");
 	}
@@ -104,7 +100,6 @@ class Features {
 			score += (featureValues[i] * FEATURE_PARAMS[i]);
 		}
 
-		System.out.println("Score: " + score);
 		return score;
 	}
 

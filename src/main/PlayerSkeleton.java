@@ -8,8 +8,7 @@ public class PlayerSkeleton {
 
 	public int height;
 
-	public double evaluate(SearchState s, int moves) {
-		//double bonusScore = (s.getRowsCleared() - height) * 0.760666 + moves * 0;
+	public double evaluate(SearchState s) {
 		return ((s.hasLost()) ? NEGATIVE_INFINITY : new Features(s.getField()).evaluate());
 	}
 
@@ -28,7 +27,7 @@ public class PlayerSkeleton {
 	// Gets the average score of the different resulting states after performing the best move for each possible piece 
 	public double expectedMove(int moves, SearchState s) {
 		if (moves == 1 || s.hasLost()) {
-			return evaluate(s, moves);
+			return evaluate(s);
 		}
 		double expectedValue = 0.0;
 		for(int nextPiece = 0; nextPiece < State.N_PIECES; nextPiece++) {
@@ -58,18 +57,17 @@ public class PlayerSkeleton {
 			maxMove = move;
 		}
 
-		//System.out.println("Move: " + maxMove + " Value: " + maxValue + " Rows: " + s.getRowsCleared());
 		return maxMove;
 	}
 	
 	public static void main(String[] args) {
 		State s = new State();
-		//new TFrame(s);
+		new TFrame(s);
 		PlayerSkeleton p = new PlayerSkeleton();
 		while(!s.hasLost()) {
 			s.makeMove(p.pickMove(s));
-			//s.draw();
-			//s.drawNext(0,0);
+			s.draw();
+			s.drawNext(0,0);
 			/*
 			try {
 				Thread.sleep(300);
@@ -86,16 +84,15 @@ class Features {
 
 	// From
 	// https://codemyroad.wordpress.com/2013/04/14/tetris-ai-the-near-perfect-player/
-	final static int NUM_FEATURES = 4;
+	final static int NUM_FEATURES = 5;
 	final static int SUM_HEIGHT = 0;
 	final static int COMPLETED_LINES = 1;
 	final static int HOLES = 2;
 	final static int BUMPINESS = 3;
-	final static String[] featureNames = { "SUM_HEIGHT", "COMPLETED_LINES",
-			"HOLES", "BUMPINESS" };
+	final static int BLOCKADES = 4;
 
 	// TODO: Enter parameters here after deciding on them
-	final static double[] FEATURE_PARAMS = { -0.510066, 0.760666, -0.35663, -0.184483 };
+	final static double[] FEATURE_PARAMS = {313300.2773120599, 229964.7308794143, -717791.124980646, -84492.84048195634, -5.460081633537773};
 
 	int[] featureValues;
 
@@ -107,22 +104,14 @@ class Features {
 	public double evaluate() {
 		double score = 0.0;
 		for (int i = 0; i < NUM_FEATURES; i++) {
-
-			/*
-			if (i < NUM_FEATURES - 1)
-				System.out.print(featureNames[i] + ": " + featureValues[i] + ", ");
-			else
-				System.out.println(featureNames[i] + ": " + featureValues[i]);
-			*/
 			score += (featureValues[i] * FEATURE_PARAMS[i]);
 		}
 
-		//System.out.println("Score: "  + score);
+		System.out.println("Score: " + score);
 		return score;
 	}
 
 	private void identifyFeatures(int[][] field) {
-
 		int[] maxHeight = getMaxHeight(field);
 
 		// TODO: Edit after deciding on features
@@ -132,6 +121,11 @@ class Features {
 				COMPLETED_LINES);
 		featureValues[HOLES] = getFeatureValue(field, maxHeight, HOLES);
 		featureValues[BUMPINESS] = getFeatureValue(field, maxHeight, BUMPINESS);
+
+        featureValues[BLOCKADES] = getFeatureValue(field, maxHeight, BLOCKADES);
+        System.out.println("Sum Height: " + featureValues[SUM_HEIGHT] + "COMPLETED_LINES: " + featureValues[COMPLETED_LINES] + 
+                "HOLES: " + featureValues[HOLES] + "BUMPINESS: " + featureValues[BUMPINESS] + 
+                "BLOCKADES: " + featureValues[BLOCKADES]);
 	}
 
 	private int getFeatureValue(int[][] field, int[] maxHeight, int featureID) {
@@ -196,7 +190,20 @@ class Features {
 					bumps += Math.abs(maxHeight[j] - maxHeight[j + 1]);
 
 				return bumps;
-
+			case BLOCKADES:
+	            int blockades = 0;
+	            for (int j = 0; j < State.COLS; j++) {
+	                boolean holeFound = false;
+	                for (int i = 0; i < maxHeight[j]; i++) {
+	                    if (field[i][j] == 0) {
+	                        holeFound = true;
+	                    }
+	                    if (holeFound && field[i][j] != 0) {
+	                        blockades++;
+	                    }
+	                }
+	            }
+	            return blockades;
 			default:
 				return -1;
 		}

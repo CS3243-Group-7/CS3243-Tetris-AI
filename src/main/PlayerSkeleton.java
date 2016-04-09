@@ -3,36 +3,43 @@ package main;
 
 public class PlayerSkeleton {
 
-	public static final int SEARCH_DEPTH = 1;
+	public static final int SEARCH_DEPTH = 2;
 	public static final double NEGATIVE_INFINITY = -2000000;
 
+	private double[] featureWeights;
+	
+	public PlayerSkeleton(double[] featureWeights) {
+	    this.featureWeights = featureWeights;
+	}
 
 	public double evaluate(SearchState s) {
-		return ((s.hasLost()) ? NEGATIVE_INFINITY : new Features(s.getField()).evaluate());
+	    double score = ((s.hasLost()) ? NEGATIVE_INFINITY : new Features(s.getField(), featureWeights).evaluate());
+	    //System.out.println("Score returned is: " + score);
+		return score;
 	}
 
 	// Gets the highest state score of all possible moves
-	public double maxMove(int moves, SearchState s) {
+	public double getBestScoreOfPossibleMoves(int moves, SearchState s) {
 		int[][] legalMoves = s.legalMoves();
 		double maxValue = NEGATIVE_INFINITY;
 		for(int move = 0; move < legalMoves.length; move++) {
 			SearchState cloneState = s.clone();
 			cloneState.makeMove(move);
-			maxValue = Math.max(maxValue, expectedMove(moves - 1, cloneState));
+			maxValue = Math.max(maxValue, getAverageScoreOfState(moves - 1, cloneState));
 		}
 		return maxValue;
 	}
 
 	// Gets the average score of the different resulting states after performing the best move for each possible piece 
-	public double expectedMove(int moves, SearchState s) {
-		if (moves == 1 || s.hasLost()) {
+	public double getAverageScoreOfState(int depth, SearchState s) {
+		if (depth == 1 || s.hasLost()) {
 			return evaluate(s);
 		}
 		s.resolveMove();
 		double expectedValue = 0.0;
 		for(int nextPiece = 0; nextPiece < State.N_PIECES; nextPiece++) {
 			s.setNextPiece(nextPiece);
-			double value = maxMove(moves, s);
+			double value = getBestScoreOfPossibleMoves(depth, s);
 			expectedValue += value;
 		}
 		expectedValue /= State.N_PIECES;
@@ -48,20 +55,22 @@ public class PlayerSkeleton {
 			SearchState searchState = new SearchState(s);
 			searchState.makeMove(move);
 
-			double nextValue = expectedMove(SEARCH_DEPTH, searchState);
+			double nextValue = getAverageScoreOfState(SEARCH_DEPTH, searchState);
 			if (nextValue > maxValue) {
 	            maxValue = nextValue;
 	            maxMove = move;
 			}
 		}
+		//System.out.println("Best attainable score of states: " + maxValue);
 
 		return maxMove;
 	}
 	
 	public static void main(String[] args) {
+	    final double[] finalisedFeatureWeights = {262277.7288257435, 368932.27367163956, -961034.7867291301, -157346.07062358136, -1.464370383197647};
 		State s = new State();
 		new TFrame(s);
-		PlayerSkeleton p = new PlayerSkeleton();
+		PlayerSkeleton p = new PlayerSkeleton(finalisedFeatureWeights);
 		while(!s.hasLost()) {
 			s.makeMove(p.pickMove(s));
 			s.draw();
@@ -85,11 +94,13 @@ class Features {
 	final static int BLOCKADES = 4;
 
 	// TODO: Enter parameters here after deciding on them
-	final static double[] FEATURE_PARAMS = {289827.9893530809, 294090.72601293115, -683705.0586926689, -96950.25669499802, -4.867328372457503E-6};
+	//final static double[] FEATURE_PARAMS = {262277.7288257435, 368932.27367163956, -961034.7867291301, -157346.07062358136, -1.464370383197647};
 
+	double[] featureWeights;
 	int[] featureValues;
 
-	public Features(int[][] field) {
+	public Features(int[][] field, double[] featureWeights) {
+	    this.featureWeights = featureWeights;
 		featureValues = new int[NUM_FEATURES];
 		identifyFeatures(field);
 	}
@@ -97,7 +108,7 @@ class Features {
 	public double evaluate() {
 		double score = 0.0;
 		for (int i = 0; i < NUM_FEATURES; i++) {
-			score += (featureValues[i] * FEATURE_PARAMS[i]);
+			score += (featureValues[i] * featureWeights[i]);
 		}
 
 		return score;

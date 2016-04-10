@@ -76,29 +76,8 @@ public class Learner {
         double mutationProbability = 1.0/10;//Features.NUM_FEATURES;
         for (int i = 0; i < NUM_WEIGHTS; i++) {
             if (Math.random() < mutationProbability) {
-                Long longValue = Double.doubleToLongBits(featureWeights[i]);
-                String bitValue = Long.toBinaryString(longValue);
-                
-                // prepend leading zeroes
-                int bitValueLength = bitValue.length();
-                for (int j = 0; j < 64 - bitValueLength; j++) {
-                    bitValue = '0' + bitValue;
-                }
-                int posToMutate = (int) Math.floor(Math.random() * 64);
-                char newBit = bitValue.charAt(posToMutate) == '1' ? '0' : '1';
-                if (posToMutate == 63) {
-                    bitValue = bitValue.substring(0, posToMutate) + newBit;
-                } else {
-                    bitValue = bitValue.substring(0, posToMutate) + newBit + bitValue.substring(posToMutate + 1);
-                }
-                
-                boolean isNegative = (bitValue.length() > 0 && bitValue.charAt(0) == '1') ? true : false;
-                if (isNegative) {
-                    bitValue = '-' + bitValue.substring(1);
-                } else {
-                    bitValue = bitValue.substring(1);
-                }
-                featureWeights[i] = Double.longBitsToDouble(Long.valueOf(bitValue, 2));
+                int negativeMultiplier = (Math.random() > 0.5) ? -1 : 1;
+                featureWeights[i] = negativeMultiplier * Math.random() * 1000000;
             }
         }
         

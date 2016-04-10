@@ -1,6 +1,6 @@
 package training.ga;
 
-import main.Player;
+import main.EMPlayer;
 import training.Feature;
 import utility.Pair;
 
@@ -74,7 +74,7 @@ public class Chromosome {
     public void calcFitness() {
         int tot = 0;
         for (int i = 0; i < TRIES; i++) {
-            tot += new Player().play(features);
+            tot += new EMPlayer().play(features);
         }
         fitness = tot / TRIES;
     }

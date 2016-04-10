@@ -1,15 +1,16 @@
 package training;
 
+import main.SearchState;
 import main.State;
 
 import java.util.function.Function;
 
 public class Feature {
 
-    private final Function<int[][], Double> eval;
+    private final Function<SearchState, Double> eval;
     private double value;
 
-    public Feature(double defaultValue, Function<int[][], Double> eval) {
+    public Feature(double defaultValue, Function<SearchState, Double> eval) {
         value = defaultValue;
         this.eval = eval;
     }
@@ -24,11 +25,11 @@ public class Feature {
         this.eval = other.getEval();
     }
 
-    public Function<int[][], Double> getEval() {
+    public Function<SearchState, Double> getEval() {
         return eval;
     }
 
-    public double getScore(int[][] field) {
+    public double getScore(SearchState field) {
         return value * eval.apply(field);
     }
 
@@ -44,8 +45,8 @@ public class Feature {
      * Common features
      */
     public static Feature getSumHeight(double defaultValue) {
-        return new Feature(defaultValue, (field) -> {
-
+        return new Feature(defaultValue, (state) -> {
+            int[][] field = state.getField();
             int[] maxHeight = getMaxHeight(field);
 
             int sumHeight = 0;
@@ -64,8 +65,8 @@ public class Feature {
     }
 
     public static Feature getCompletedLines(double defaultValue) {
-        return new Feature(defaultValue, (field) -> {
-
+        return new Feature(defaultValue, (state) -> {
+            int[][] field = state.getField();
             int[] maxHeight = getMaxHeight(field);
 
             int completedLines = 0;
@@ -91,7 +92,8 @@ public class Feature {
     }
 
     public static Feature getHoleCount(double defaultValue) {
-        return new Feature(defaultValue, (field) -> {
+        return new Feature(defaultValue, (state) -> {
+            int[][] field = state.getField();
             int[] maxHeight = getMaxHeight(field);
 
             int holes = 0;
@@ -107,7 +109,8 @@ public class Feature {
     }
 
     public static Feature getBumpiness(double defaultValue) {
-        return new Feature(defaultValue, (field) -> {
+        return new Feature(defaultValue, (state) -> {
+            int[][] field = state.getField();
             int[] maxHeight = getMaxHeight(field);
 
             int bumpiness = 0;
@@ -144,7 +147,8 @@ public class Feature {
      * Return weighted filled cells. cells at row-i costs i.
      */
     public static Feature getWeightedFilledCells(double defaultValue) {
-        return new Feature(defaultValue, (field) -> {
+        return new Feature(defaultValue, (state) -> {
+            int[][] field = state.getField();
             int filledCells = 0;
             ;
             for (int i = 0; i < State.ROWS; ++i) {
@@ -162,7 +166,8 @@ public class Feature {
      *  The depth of the deepest hole (a width-1 hole with filled spots on both sides)
      */
     public static Feature getDeepestOneHole(double defaultValue) {
-        return new Feature(defaultValue, (field) -> {
+        return new Feature(defaultValue, (state) -> {
+            int[][] field = state.getField();
             for (int i = 0; i < State.ROWS; ++i) {
                 for (int j = 0; j < State.COLS; ++j) {
                     int left = (j - 1 < 0 ? 1 : field[i][j-1]);
@@ -180,7 +185,8 @@ public class Feature {
      *  The total depth of all the holes on the game board
      */
     public static Feature getSumOfAllHoles(double defaultValue) {
-        return new Feature(defaultValue, (field) -> {
+        return new Feature(defaultValue, (state) -> {
+            int[][] field = state.getField();
             int holesSum = 0;
             int[] maxHeight = getMaxHeight(field);
             for (int j = 0; j < State.COLS; ++j) {
@@ -198,7 +204,8 @@ public class Feature {
      * Horizontal Roughness - The number of times a spot alternates between an empty and a filled status, going by rows
      */
     public static Feature getHorizontalRoughness(double defaultValue) {
-        return new Feature(defaultValue, (field) -> {
+        return new Feature(defaultValue, (state) -> {
+            int[][] field = state.getField();
             int horizontalRoughness = 0;
             for (int i = 0; i < State.ROWS; ++i) {
                 for (int j = 1; j < State.COLS; ++j) {
@@ -215,7 +222,8 @@ public class Feature {
      * Vertical Roughness - The number of times a spot alternates between an empty and a filled status, going by columns
      */
     public static Feature getVerticalRoughness(double defaultValue) {
-        return new Feature(defaultValue, (field) -> {
+        return new Feature(defaultValue, (state) -> {
+            int[][] field = state.getField();
             int verticalRoughness = 0;
             for (int j = 0; j < State.COLS; ++j) {
                 for (int i = 1; i < State.ROWS; ++i) {
@@ -232,7 +240,8 @@ public class Feature {
      * The number of holes that are 3 or more blocks deep
      */
     public static Feature getWellCount(double defaultValue) {
-        return new Feature(defaultValue, (field) -> {
+        return new Feature(defaultValue, (state) -> {
+            int[][] field = state.getField();
             int numberOfWells = 0;
             int[] maxHeight = getMaxHeight(field);
             for (int j = 0; j < State.COLS; ++j) {
@@ -252,7 +261,8 @@ public class Feature {
      * Weighted empty cells
      */
     public static Feature getWeightedEmptyCells(double defaultValue) {
-        return new Feature(defaultValue, (field) -> {
+        return new Feature(defaultValue, (state) -> {
+            int[][] field = state.getField();
             int emptyCells = 0;
             int[] maxHeight = getMaxHeight(field);
             for (int j = 0; j < State.COLS; ++j) {
@@ -270,7 +280,8 @@ public class Feature {
      * The height of the highest hole on the board
      */
     public static Feature getHighestHole(double defaultValue) {
-        return new Feature(defaultValue, (field) -> {
+        return new Feature(defaultValue, (state) -> {
+            int[][] field = state.getField();
             int[] maxHeight = getMaxHeight(field);
             for (int i = State.ROWS - 1; i >= 0; --i) {
                 for (int j = 0; j < State.COLS; ++j) {
@@ -287,7 +298,8 @@ public class Feature {
      * (h2 – h1) + |h2 – h3| + |h3 – h4| + |h4 – h5| + |h5 – h6| + |h6 – h7| + |h7 – h8| + |h8 – h9| + (h9 – h10)
      */
     public static Feature getSurfaceSmoothness(double defaultValue) {
-        return new Feature(defaultValue, (field) -> {
+        return new Feature(defaultValue, (state) -> {
+            int[][] field = state.getField();
             int surfaceSmoothness = 0;
             int[] maxHeight = getMaxHeight(field);
             surfaceSmoothness += maxHeight[1] - maxHeight[0];
@@ -303,7 +315,8 @@ public class Feature {
      * for every well of depth w, sum 1 + 2 + 3 + ... + w
      */
     public static Feature getSumSquareWells(double defaultValue) {
-        return new Feature(defaultValue, (field) -> {
+        return new Feature(defaultValue, (state) -> {
+            int[][] field = state.getField();
             int sum = 0;
             int[] maxHeight = getMaxHeight(field);
             for (int j = 0; j < State.COLS; ++j) {
@@ -322,7 +335,8 @@ public class Feature {
     }
 
     public static Feature getSumWellDepths(double defaultValue) {
-        return new Feature(defaultValue, (field) -> {
+        return new Feature(defaultValue, (state) -> {
+            int[][] field = state.getField();
             int sum = 0;
             for (int j = 0; j < State.COLS; ++j) {
                 int wellDepth = 0;
@@ -346,25 +360,29 @@ public class Feature {
     /**
      * compute the lowest and highest position of new piece. compute the total
      */
-    /*
-    public static Feature gettetrominoHeight(double defaultValue) {
-        int fieldBeforeCleared[][] = nextState.fieldBeforeCleared;
-        if (nextState.lost) {
-            return State.ROWS;
-        }
-        int minHeightPiece = Integer.MAX_VALUE;
-        int maxHeightPiece = Integer.MIN_VALUE;
-        for (int i = 0; i < State.ROWS; ++i) {
-            for (int j = 0; j < State.COLS; ++j) {
-                if (fieldBeforeCleared[i][j] == nextState.turn) {
-                    minHeightPiece = Math.min(minHeightPiece,i);
-                    maxHeightPiece = Math.max(maxHeightPiece,i);
+
+    public static Feature getTetrominoHeight(double defaultValue) {
+        return new Feature(defaultValue, (state) -> {
+            int[][] unclearedField = state.getUnclearedField();
+            if (state.lost) {
+                return 1.0d * State.ROWS;
+            } else {
+                int minHeightPiece = Integer.MAX_VALUE;
+                int maxHeightPiece = Integer.MIN_VALUE;
+
+                for (int i = 0; i < State.ROWS; ++i) {
+                    for (int j = 0; j < State.COLS; ++j) {
+                        if (unclearedField[i][j] == state.getTurnNumber()) {
+                            minHeightPiece = Math.min(minHeightPiece,i);
+                            maxHeightPiece = Math.max(maxHeightPiece,i);
+                        }
+                    }
                 }
+                return (maxHeightPiece + minHeightPiece) / 2d;
             }
-        }
-        return (float)(maxHeightPiece + minHeightPiece) / 2f;
+        });
     }
-    */
+
 
     /**
      * return the landing height of the new piece
@@ -387,7 +405,8 @@ public class Feature {
     */
 
     public static Feature getRowTransitions(double defaultValue) {
-        return new Feature(defaultValue, (field) -> {
+        return new Feature(defaultValue, (state) -> {
+            int[][] field = state.getField();
             int sum = 0;
             for (int i = 0; i < State.ROWS; ++i) {
                 for (int j = 0; j < State.COLS; ++j) {
@@ -406,7 +425,8 @@ public class Feature {
     }
 
     public static Feature getColumnTransitions(double defaultValue) {
-        return new Feature(defaultValue, (field) -> {
+        return new Feature(defaultValue, (state) -> {
+            int[][] field = state.getField();
             int sum = 0;
             for (int j = 0; j < State.COLS; ++j) {
                 for (int i = 0; i < State.ROWS; ++i) {

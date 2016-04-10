@@ -22,6 +22,7 @@ public class SearchState {
 
     //each square in the grid - int means empty - other values mean the turn it was placed
     private int[][] field = new int[State.ROWS][State.COLS];
+    private int[][] unclearedField = new int[State.ROWS][State.COLS];
     //top row+1 of each column
     //0 means empty
     private int[] top = new int[State.COLS];
@@ -29,8 +30,12 @@ public class SearchState {
     //number of next piece
     protected int nextPiece;
 
-    public int[][] getField() {
+    ppublic int[][] getField() {
         return field;
+    }
+
+    public int[][] getUnclearedField() {
+        return unclearedField;
     }
 
     public int[] getTop() {
@@ -120,6 +125,8 @@ public class SearchState {
         for(int c = 0; c < State.getpWidth()[nextPiece][orient]; c++) {
             top[slot+c]=height+State.getpTop()[nextPiece][orient][c];
         }
+
+        unclearedField = getCloneField(field);
 
         int rowsCleared = 0;
 

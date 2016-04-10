@@ -89,7 +89,7 @@ public class Chromosome {
         str.append(getFitness());
         str.append("\n");
         str.append("{ ");
-        Arrays.stream(features).forEach(feature -> str.append(feature.getEval() + " "));
+        Arrays.stream(features).forEach(feature -> str.append(feature.getValue() + " "));
         str.append("}");
         return str.toString();
     }

@@ -11,13 +11,27 @@ public class EMPlayer {
     public int height;
     private Feature[] currentFeatures = new Feature[] {
         //Feature.getSumHeight(-0.510066),
+            /*
         Feature.getRowTransitions(-0.424),
                 Feature.getColumnTransitions(-2.026),
                 Feature.getHighestHole(-0.663),
                 Feature.getSumWellDepths(-0.425),
                 Feature.getCompletedLines(0.760666),
                 Feature.getHoleCount(-0.35663),
-                Feature.getBumpiness(-0.184483)
+                Feature.getBumpiness(-0.184483)*/
+
+            Feature.getRowTransitions(-53.27320737587168),
+            Feature.getColumnTransitions(-145.06727639988992),
+            Feature.getHighestHole(-43.95984270473729),
+            Feature.getSumWellDepths(-63.042919410028205),
+            Feature.getCompletedLines(69.25851394329032),
+            Feature.getHoleCount(-78.0635010816997),
+            Feature.getBumpiness(25.634107098625833),
+            Feature.getTetrominoHeight(14.484499154548757),
+            Feature.getLandingHeight(-88.6050842387738)
+
+
+
     };;
 
     public double evaluate(SearchState s, int moves) {

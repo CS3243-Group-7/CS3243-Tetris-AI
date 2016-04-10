@@ -17,7 +17,9 @@ public class Train {
                 Feature.getSumWellDepths(-0.425),
                 Feature.getCompletedLines(0.760666),
                 Feature.getHoleCount(-0.35663),
-                Feature.getBumpiness(-0.184483)
+                Feature.getBumpiness(-0.184483),
+                Feature.getTetrominoHeight(-0.184483),
+                Feature.getLandingHeight(-0.384483)
         };
     }
 
@@ -25,10 +27,13 @@ public class Train {
         initFeatures();
         Population population = new Population(5, features);
         Chromosome bestGuy = population.evolve();
-        System.out.println("bestGuy: " + bestGuy);
+        System.out.println(">>>> BestGuy: " + bestGuy);
     }
 
     public static void main(String[] args) {
-        new Train().train();
+        int runCount = 10;
+        while(runCount-- > 0) {
+            new Train().train();
+        }
     }
 }

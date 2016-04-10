@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
+import java.math.*;
 
 public class Population {
     private int populationSize;
@@ -36,6 +37,18 @@ Time: 339, Clear 206364
         }
     }
 
+    public boolean isEqualFeatures(Feature[] features1, Feature[] features2) {
+        if (features1 == null) {
+            return false;
+        }
+        for (int j = 0; j < features1.length; j++) {
+            if (Math.abs(features1[j].getValue() - features2[j].getValue()) > 1e-4) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public Chromosome evolve() {
         int time = 0;
         int maxFitness = 0;
@@ -43,6 +56,8 @@ Time: 339, Clear 206364
             chromosome.calcFitness();
             maxFitness = Math.max(maxFitness, chromosome.getFitness());
         }
+        Feature[] previousFeatures = null;
+        int stuckTimeout = 5;
         while (time < 500 && maxFitness < 1000000) {
             System.out.printf("Time: %d, Clear %d\n", time, maxFitness);
             time++;
@@ -78,10 +93,19 @@ Time: 339, Clear 206364
                 maxFitness = Math.max(maxFitness, pool.get(i).getFitness());
             }
             Feature[] features = pool.get(0).getFeatures();
+            if (isEqualFeatures(previousFeatures, features)) {
+                stuckTimeout--;
+                if (stuckTimeout == 0) {
+                    break;
+                }
+            } else {
+                stuckTimeout = 5;
+            }
             for (int j = 0; j < features.length; j++) {
                 System.out.print(features[j].getValue() + " ");
             }
             System.out.println();
+            previousFeatures = features;
         }
         return pool.get(0);
     }

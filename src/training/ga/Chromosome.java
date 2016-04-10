@@ -67,7 +67,7 @@ public class Chromosome {
     public void mutate() {
         int id = random.nextInt(features.length);
         double oldValue = features[id].getValue();
-        double newValue = random.nextGaussian() * 10 + oldValue;
+        double newValue = random.nextGaussian() * 20 + oldValue;
         features[id].setValue(newValue);
     }
 

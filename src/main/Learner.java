@@ -11,7 +11,8 @@ public class Learner {
 
     public static int NUM_WEIGHTS = Features.NUM_FEATURES;
     public static Logger logger = Logger.getGlobal();
-    public static int GAMES_COUNT = 1000;
+    public static int GAMES_COUNT = 20;
+    public static double TOP_PERFORMERS = 1.0;
     private double[][] featureWeights;
     
     private void initialiseFeatureWeights() {
@@ -72,7 +73,7 @@ public class Learner {
     }
     
     private double[] mutate(double[] featureWeights) {
-        double mutationProbability = 1.0/NUM_WEIGHTS;//100;//Features.NUM_FEATURES;
+        double mutationProbability = 1.0/10;//Features.NUM_FEATURES;
         for (int i = 0; i < NUM_WEIGHTS; i++) {
             if (Math.random() < mutationProbability) {
                 Long longValue = Double.doubleToLongBits(featureWeights[i]);
@@ -106,14 +107,15 @@ public class Learner {
     private double getCutOffScore(double[] gameScores) {
         double[] clonedGameScores = gameScores.clone();
         Arrays.sort(clonedGameScores);
-        return clonedGameScores[(int)(GAMES_COUNT * 0.9)];
+        return clonedGameScores[(int)(GAMES_COUNT * (1.0 - TOP_PERFORMERS))];
     }
     
     private void updateWeights(double[] gameScores) {
         // select new weights based on performance
 
-        double cutOffScore = getCutOffScore(gameScores);
-        System.out.println("cutOffScore: " + cutOffScore);
+        //double cutOffScore = getCutOffScore(gameScores);
+        double cutOffScore = 0.0;
+        //System.out.println("cutOffScore: " + cutOffScore);
         for (int i = 0; i < GAMES_COUNT; i++) {
             int chosenIndex = getRandomIndex(gameScores, cutOffScore);
             int chosenIndex2 = getRandomIndex(gameScores, cutOffScore);
@@ -162,9 +164,10 @@ public class Learner {
                     }
                     
                     double totalScoreOfGames = 0;
-                    final int[] gameScores = new int[GAMES_COUNT];
-                    Thread[] threads = new Thread[100];
-                    for (int j = 0; j < 100; j++) {
+                    int gameRuns = 10;
+                    final int[] gameScores = new int[gameRuns];
+                    Thread[] threads = new Thread[gameRuns];
+                    for (int j = 0; j < gameRuns; j++) {
                         final int index = j;
                         
                         threads[j] = new Thread() {
@@ -175,7 +178,7 @@ public class Learner {
                         };
                         threads[j].start();
                     }
-                    for (int j = 0; j < 100; j++) {
+                    for (int j = 0; j < gameRuns; j++) {
                         try {
                             threads[j].join();
                         } catch (InterruptedException e) {
@@ -183,10 +186,10 @@ public class Learner {
                             e.printStackTrace();
                         }
                     }
-                    for (int j = 0; j < 100; j++) {
+                    for (int j = 0; j < gameRuns; j++) {
                         totalScoreOfGames += gameScores[j];
                     }
-                    double averageScoreOfGames = totalScoreOfGames/100.0;
+                    double averageScoreOfGames = totalScoreOfGames/(double)gameRuns;
                     
                     gameResults += averageScoreOfGames;
                     if (i != GAMES_COUNT - 1) {

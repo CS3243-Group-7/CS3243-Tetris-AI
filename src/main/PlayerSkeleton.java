@@ -87,14 +87,15 @@ class Features {
 
 	// From
 	// https://codemyroad.wordpress.com/2013/04/14/tetris-ai-the-near-perfect-player/
-	final static int NUM_FEATURES = 7;
+	final static int NUM_FEATURES = 8;
 	final static int SUM_HEIGHT = 0;
 	final static int COMPLETED_LINES = 1;
 	final static int HOLES = 2;
 	final static int BUMPINESS = 3;
 	final static int BLOCKADES = 4;
-	final static int HIGHEST = 5;
-	final static int HEIGHTDIFF_MAXMIN = 6;
+	final static int HIGHEST_HOLE = 5;
+	final static int WELL_COUNT = 6;
+    final static int VERTICAL_ROUGHNESS = 7;
 
 	// TODO: Enter parameters here after deciding on them
 	//final static double[] FEATURE_PARAMS = {262277.7288257435, 368932.27367163956, -961034.7867291301, -157346.07062358136, -1.464370383197647};
@@ -194,26 +195,36 @@ class Features {
 	                }
 	            }
 	            return blockades;
-			case HIGHEST:
-                int highest = 0;
+			case HIGHEST_HOLE:
+                int height = 0;
+
                 for (int j = 0; j < State.COLS; j++) {
-                    if (maxHeight[j] > highest) {
-                        highest = maxHeight[j];
+                    for (int i = 0; i < maxHeight[j] - 1; i++) {
+                        if (field[i][j] == 0 && i > height)
+                            height = i;
                     }
                 }
-                return highest;
-			case HEIGHTDIFF_MAXMIN:
-                int highestCol = 0;
-                int lowestCol = State.ROWS;
+                return height;
+			case WELL_COUNT:
+			    int wells = 0;
+
                 for (int j = 0; j < State.COLS; j++) {
-                    if (maxHeight[j] > highestCol) {
-                        highest = maxHeight[j];
-                    }
-                    if (maxHeight[j] < lowestCol) {
-                        lowestCol = maxHeight[j];
+                    for (int i = 0; i < maxHeight[j] - 3; i++) {
+                        if (field[i][j] == 0)
+                            wells++;
                     }
                 }
-                return highestCol - lowestCol;
+
+                return wells;
+			case VERTICAL_ROUGHNESS:
+			    int roughness = 0;
+			    for (int j = 0; j < State.COLS; j++) {
+                    for (int i = 0; i < maxHeight[j] - 1; i++) {
+                        if ((field[i][j] == 0 && field[i+1][j] != 0) || (field[i][j] != 0 && field[i+1][j] == 0))
+                            roughness++;
+                    }
+                }
+			    return roughness;
 			default:
 				return -1;
 		}

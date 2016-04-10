@@ -76,9 +76,10 @@ public class Player {
 
     private double getFeaturesScore(int[][] field) {
         double sum = 0;
+        /*
         for (int i = 0; i < currentFeatures.length; i++) {
             sum += currentFeatures[i].getScore(field);
-        }
+        }*/
         return sum;
     }
 

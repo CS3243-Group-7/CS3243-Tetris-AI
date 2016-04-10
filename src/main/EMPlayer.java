@@ -5,7 +5,7 @@ import training.Feature;
  */
 public class EMPlayer {
 
-    public static final int SEARCH_DEPTH = 2;
+    public static final int SEARCH_DEPTH = 1;
     public static final double NEGATIVE_INFINITY = -2000000;
 
     public int height;

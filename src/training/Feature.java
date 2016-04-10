@@ -387,22 +387,26 @@ public class Feature {
     /**
      * return the landing height of the new piece
      */
-    /*
-    public static Feature getlandingHeight(double defaultValue) {
-        int fieldBeforeCleared[][] = nextState.fieldBeforeCleared;
-        if (nextState.lost) {
-            return State.ROWS;
-        }
-        for (int i = 0; i < State.ROWS; ++i) {
-            for (int j = 0; j < State.COLS; ++j) {
-                if (fieldBeforeCleared[i][j] == nextState.turn) {
-                    return i;
+
+    public static Feature getLandingHeight(double defaultValue) {
+
+        return new Feature(defaultValue, (state) -> {
+            int[][] unclearedField = state.getUnclearedField();
+            if (state.lost) {
+                return 1.0d * State.ROWS;
+            } else {
+                for (int i = 0; i < State.ROWS; ++i) {
+                    for (int j = 0; j < State.COLS; ++j) {
+                        if (unclearedField[i][j] == state.getTurnNumber()) {
+                            return 1.0d * i;
+                        }
+                    }
                 }
+                return 0.0d;
             }
-        }
-        return 0;
+        });
     }
-    */
+
 
     public static Feature getRowTransitions(double defaultValue) {
         return new Feature(defaultValue, (state) -> {

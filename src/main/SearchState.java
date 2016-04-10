@@ -30,7 +30,7 @@ public class SearchState {
     //number of next piece
     protected int nextPiece;
 
-    ppublic int[][] getField() {
+    public int[][] getField() {
         return field;
     }
 

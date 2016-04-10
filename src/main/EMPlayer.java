@@ -21,7 +21,7 @@ public class EMPlayer {
     };;
 
     public double evaluate(SearchState s, int moves) {
-        return ((s.hasLost()) ? NEGATIVE_INFINITY : getFeaturesScore(s.getField()));
+        return ((s.hasLost()) ? NEGATIVE_INFINITY : getFeaturesScore(s));
     }
 
     public double maxMove(int moves, SearchState s) {
@@ -71,10 +71,10 @@ public class EMPlayer {
         return maxMove;
     }
 
-    private double getFeaturesScore(int[][] field) {
+    private double getFeaturesScore(SearchState state) {
         double sum = 0;
         for (int i = 0; i < currentFeatures.length; i++) {
-            sum += currentFeatures[i].getScore(field);
+            sum += currentFeatures[i].getScore(state);
         }
         return sum;
     }

@@ -17,15 +17,15 @@ public class Train {
                 Feature.getSumWellDepths(-0.425),
                 Feature.getCompletedLines(0.760666),
                 Feature.getHoleCount(-0.35663),
-                Feature.getBumpiness(-0.184483),
-                Feature.getTetrominoHeight(-0.184483),
+                Feature.getBumpiness(-0.684483),
+                Feature.getTetrominoHeight(-0.684483),
                 Feature.getLandingHeight(-0.384483)
         };
     }
 
     public void train() {
         initFeatures();
-        Population population = new Population(5, features);
+        Population population = new Population(3, features);
         Chromosome bestGuy = population.evolve();
         System.out.println(">>>> BestGuy: " + bestGuy);
     }

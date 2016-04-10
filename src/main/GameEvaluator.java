@@ -7,10 +7,10 @@ import java.util.Collections;
  * Created by zeulb on 3/19/16.
  */
 public class GameEvaluator {
-    public static final int CHECK_STATUS = 1000;
+    public static final int CHECK_STATUS = 10000;
 
     public static void main(String[] args) {
-        int play = 1;
+        int play = 10;
         int totalRows = 0;
         int maxRows = Integer.MIN_VALUE;
         int minRows = Integer.MAX_VALUE;
@@ -20,7 +20,7 @@ public class GameEvaluator {
             EMPlayer p = new EMPlayer();
             while (!s.hasLost()) {
                 if (s.getTurnNumber()%CHECK_STATUS == 0) {
-                    System.out.println("Turn " + s.getTurnNumber() + ": " + s.getRowsCleared() + " rows cleared.");
+                    System.out.println("Game " + (i+1) + "-> Turn " + s.getTurnNumber() + ": " + s.getRowsCleared() + " rows cleared.");
                 }
                 s.makeMove(p.pickMove(s));
             }
@@ -29,7 +29,7 @@ public class GameEvaluator {
             maxRows = Math.max(maxRows, rowsCleared);
             minRows = Math.min(minRows, rowsCleared);
             rows.add(rowsCleared);
-            System.out.println("Game " + (i+1) + ": " + rowsCleared);
+            System.out.println("Game " + (i+1) + "-> Rows cleared: " + rowsCleared);
         }
         Collections.sort(rows);
         System.out.println("--------------------------------------");

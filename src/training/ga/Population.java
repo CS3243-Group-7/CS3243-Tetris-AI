@@ -57,7 +57,7 @@ Time: 339, Clear 206364
             maxFitness = Math.max(maxFitness, chromosome.getFitness());
         }
         Feature[] previousFeatures = null;
-        int stuckTimeout = 5;
+        int stuckTimeout = 2;
         while (time < 500 && maxFitness < 1000000) {
             System.out.printf("Time: %d, Clear %d\n", time, maxFitness);
             time++;
@@ -99,7 +99,7 @@ Time: 339, Clear 206364
                     break;
                 }
             } else {
-                stuckTimeout = 5;
+                stuckTimeout = 2;
             }
             for (int j = 0; j < features.length; j++) {
                 System.out.print(features[j].getValue() + " ");

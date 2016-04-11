@@ -19,6 +19,13 @@ public class EMPlayer {
                 Feature.getCompletedLines(0.760666),
                 Feature.getHoleCount(-0.35663),
                 Feature.getBumpiness(-0.184483)*/
+            /*
+
+                Total Games played: 30
+                Average rows cleared : 918687.5666666667
+                Maximum rows cleared : 4828272
+                Minimum rows cleared : 18908
+                Median rows cleared : 455034
 
             Feature.getRowTransitions(-53.27320737587168),
             Feature.getColumnTransitions(-145.06727639988992),
@@ -29,6 +36,24 @@ public class EMPlayer {
             Feature.getBumpiness(25.634107098625833),
             Feature.getTetrominoHeight(14.484499154548757),
             Feature.getLandingHeight(-88.6050842387738)
+            */
+
+            /*
+                Total Games played: 10
+                Average rows cleared : 886354.2
+                Maximum rows cleared : 2031498
+                Minimum rows cleared : 35439
+                Median rows cleared : 1061101
+             */
+
+            Feature.getRowTransitions(-67.11061091425087),
+            Feature.getColumnTransitions(-122.9652134563754),
+            Feature.getHighestHole(-144.0515357127958),
+            Feature.getSumWellDepths(-30.73763762236706),
+            Feature.getCompletedLines(-59.99117699581329),
+            Feature.getHoleCount(11.23640769827946),
+            Feature.getBumpiness(3.9095401191597183),
+            Feature.getLandingHeight(-68.77392935817008)
 
 
 

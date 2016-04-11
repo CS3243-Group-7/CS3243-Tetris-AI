@@ -14,6 +14,8 @@ public class Population {
     private int populationSize;
     private List<Chromosome> pool = new ArrayList<>();
 
+    static Object lock = new Object();
+
     /*
    Time: 49, Clear 22338
 -22.438780022805837 -45.064314711053854 -27.721263040811543 -12.780864859022078 -10.528864905504271 -54.599860057271286 -9.967402960897353
@@ -60,11 +62,15 @@ Time: 339, Clear 206364
             Collections.sort(pool, (a, b) -> -Integer.compare(a.getFitness(), b.getFitness()));
 
             Feature[] features = pool.get(0).getFeatures();
-            for (int j = 0; j < features.length; j++) {
-                System.out.print(features[j].getValue() + " ");
+
+            synchronized (lock) {
+                System.out.print("Thread #" + Thread.currentThread().getId());
+                for (int j = 0; j < features.length; j++) {
+                    System.out.print(" " + features[j].getValue());
+                }
+                System.out.println();
+                System.out.printf("Thread #" + Thread.currentThread().getId() + " Time: %d, Clear %d\n", time, pool.get(0).getFitness());
             }
-            System.out.println();
-            System.out.printf("Time: %d, Clear %d\n", time, pool.get(0).getFitness());
 
             if (isEqualFeatures(previousFeatures, features)) {
                 stuckTimeout--;
@@ -108,5 +114,9 @@ Time: 339, Clear 206364
             }
         }
         return pool.get(0);
+    }
+
+    private synchronized void print() {
+
     }
 }

@@ -3,11 +3,15 @@ package training;
 import training.ga.Chromosome;
 import training.ga.Population;
 
-public class Train {
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public class Train implements Runnable {
 
     //final static double[] FEATURE_PARAMS = { -0.510066, 0.760666, -0.35663, -0.184483 };
     private Feature[] features;
-    static Chromosome bestMan = null;
+    static Chromosome bestDude = null;
+    private Chromosome bestGuy;
 
     private void initFeatures() {
         features = new Feature[] {
@@ -24,24 +28,34 @@ public class Train {
         };
     }
 
-    public void train() {
+    @Override
+    public void run() {
+        System.out.println("Thread #" + Thread.currentThread().getId() + " has been started");
         initFeatures();
         Population population = new Population(5, features);
-        Chromosome bestGuy = population.evolve();
-        System.out.println(">>>> BestGuy: " + bestGuy);
-        if (bestMan == null || bestGuy.getFitness() > bestMan.getFitness()) {
-            bestMan = bestGuy;
-            System.out.println("NEW BEST");
+        bestGuy = population.evolve();
+        System.out.println("Thread #" + Thread.currentThread().getId() + " >>>> BestGuy: " + bestGuy);
+        update();
+    }
+
+    private synchronized void update() {
+        System.out.println("========================================================");
+        if (bestDude == null || bestGuy.getFitness() > bestDude.getFitness()) {
+            bestDude = bestGuy;
+            System.out.println("Thread #" + Thread.currentThread().getId() + " NEW BEST");
         }
-        System.out.println(">>>>>>>> BestMan: " + bestMan);
+        System.out.println(">>>>>>>> BestDude: " + bestDude);
+        System.out.println("========================================================");
+        System.out.println();
     }
 
     public static void main(String[] args) {
         //int runCount = 100;
-        while(true) {
-            System.out.println("========================================================");
-            new Train().train();
-            System.out.println();
+        ExecutorService service = Executors.newFixedThreadPool(4);
+        for (int i = 0; i < 10; i++) {
+            Runnable worker = new Train();
+            service.execute(worker);
         }
+        service.shutdown();
     }
 }

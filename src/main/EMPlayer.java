@@ -44,7 +44,7 @@ public class EMPlayer {
                 Maximum rows cleared : 2031498
                 Minimum rows cleared : 35439
                 Median rows cleared : 1061101
-             */
+
 
             Feature.getRowTransitions(-67.11061091425087),
             Feature.getColumnTransitions(-122.9652134563754),
@@ -54,6 +54,16 @@ public class EMPlayer {
             Feature.getHoleCount(11.23640769827946),
             Feature.getBumpiness(3.9095401191597183),
             Feature.getLandingHeight(-68.77392935817008)
+            */
+
+            Feature.getRowTransitions(-35.52957024967272),
+            Feature.getColumnTransitions(-134.6672752541678),
+            Feature.getHighestHole(-17.122061720143),
+            Feature.getSumWellDepths(-29.670548675771812),
+            Feature.getCompletedLines(-9.42843787022721),
+            Feature.getHoleCount(-0.3758278787571818),
+            Feature.getBumpiness(-20.995759679252068),
+            Feature.getTetrominoHeight(-24.20022565302744)
 
 
 

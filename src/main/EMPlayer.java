@@ -74,7 +74,6 @@ public class EMPlayer {
             Maximum rows cleared : 15752509
             Minimum rows cleared : 900425
             Median rows cleared : 8114362
-             */
 
             Feature.getRowTransitions(-30.626391639690418),
             Feature.getColumnTransitions(-163.95808449217805),
@@ -84,6 +83,21 @@ public class EMPlayer {
             Feature.getHoleCount(-48.249685438465704),
             Feature.getBumpiness(-22.150839117903306),
             Feature.getTetrominoHeight(-47.90906522929762)
+            */
+
+            /*
+            Thread #10 -28.38961940613187 -156.44285387681316 -51.44293285381132 -94.54910669834868 54.884481612413374 -208.95775949459315 -62.245132391543656 -52.50989286632513
+            Thread #10 Time: 4, Clear 9497143
+            */
+            
+            Feature.getRowTransitions(-28.38961940613187),
+            Feature.getColumnTransitions(-156.44285387681316),
+            Feature.getHighestHole(-51.44293285381132),
+            Feature.getSumWellDepths(-94.54910669834868),
+            Feature.getCompletedLines(54.884481612413374),
+            Feature.getHoleCount(-208.95775949459315),
+            Feature.getBumpiness(-62.245132391543656 ),
+            Feature.getTetrominoHeight(-52.50989286632513)
 
     };;
 

@@ -54,7 +54,6 @@ public class EMPlayer {
             Feature.getHoleCount(11.23640769827946),
             Feature.getBumpiness(3.9095401191597183),
             Feature.getLandingHeight(-68.77392935817008)
-            */
 
             Feature.getRowTransitions(-35.52957024967272),
             Feature.getColumnTransitions(-134.6672752541678),
@@ -64,8 +63,27 @@ public class EMPlayer {
             Feature.getHoleCount(-0.3758278787571818),
             Feature.getBumpiness(-20.995759679252068),
             Feature.getTetrominoHeight(-24.20022565302744)
+            */
 
 
+            /*
+            Thread #13 -30.626391639690418 -163.95808449217805 -34.23551272755225 -40.88255117586515 -30.502630504332217 -48.249685438465704 -22.150839117903306 -47.90906522929762
+            Thread #13 Time: 4, Clear 2933655
+            Total Games played: 10
+            Average rows cleared : 7432217.3
+            Maximum rows cleared : 15752509
+            Minimum rows cleared : 900425
+            Median rows cleared : 8114362
+             */
+
+            Feature.getRowTransitions(-30.626391639690418),
+            Feature.getColumnTransitions(-163.95808449217805),
+            Feature.getHighestHole(-34.23551272755225),
+            Feature.getSumWellDepths(-40.88255117586515),
+            Feature.getCompletedLines(-30.502630504332217),
+            Feature.getHoleCount(-48.249685438465704),
+            Feature.getBumpiness(-22.150839117903306),
+            Feature.getTetrominoHeight(-47.90906522929762)
 
     };;
 

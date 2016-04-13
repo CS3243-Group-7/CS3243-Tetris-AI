@@ -7,10 +7,10 @@ import java.util.Collections;
  * Created by zeulb on 3/19/16.
  */
 public class GameEvaluator {
-    public static final int CHECK_STATUS = 10000;
+    public static final int CHECK_STATUS = 1000;
 
     public static void main(String[] args) {
-        int play = 10;
+        int play = 1;
         int totalRows = 0;
         int maxRows = Integer.MIN_VALUE;
         int minRows = Integer.MAX_VALUE;

@@ -5,7 +5,7 @@ import training.Feature;
  */
 public class EMPlayer {
 
-    public static final int SEARCH_DEPTH = 1;
+    public static final int SEARCH_DEPTH = 2;
     public static final double NEGATIVE_INFINITY = -2000000;
 
     public int height;
@@ -74,7 +74,7 @@ public class EMPlayer {
             Maximum rows cleared : 15752509
             Minimum rows cleared : 900425
             Median rows cleared : 8114362
-
+            */
             Feature.getRowTransitions(-30.626391639690418),
             Feature.getColumnTransitions(-163.95808449217805),
             Feature.getHighestHole(-34.23551272755225),
@@ -83,13 +83,18 @@ public class EMPlayer {
             Feature.getHoleCount(-48.249685438465704),
             Feature.getBumpiness(-22.150839117903306),
             Feature.getTetrominoHeight(-47.90906522929762)
-            */
+
 
             /*
             Thread #10 -28.38961940613187 -156.44285387681316 -51.44293285381132 -94.54910669834868 54.884481612413374 -208.95775949459315 -62.245132391543656 -52.50989286632513
             Thread #10 Time: 4, Clear 9497143
-            */
-            
+
+            Total Games played: 10
+            Average rows cleared : 4579975.8
+            Maximum rows cleared : 11547762
+            Minimum rows cleared : 587710
+            Median rows cleared : 3783635
+
             Feature.getRowTransitions(-28.38961940613187),
             Feature.getColumnTransitions(-156.44285387681316),
             Feature.getHighestHole(-51.44293285381132),
@@ -98,6 +103,9 @@ public class EMPlayer {
             Feature.getHoleCount(-208.95775949459315),
             Feature.getBumpiness(-62.245132391543656 ),
             Feature.getTetrominoHeight(-52.50989286632513)
+            */
+
+
 
     };;
 
